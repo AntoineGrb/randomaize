@@ -8,13 +8,13 @@ export default async function handler(
   try {
     const apiKey = process.env.OPENAI_API_KEY;
 
-    const prompt = "Salut";
+    const prompt = "Salut ça va ?";
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
         model: "gpt-3.5-turbo",
         messages: [
-          // {role:"system", content:"You are xxx"},
+          { role: "system", content: "Tu réponds uniquement en espagnol" },
           { role: "user", content: prompt },
         ],
       },
