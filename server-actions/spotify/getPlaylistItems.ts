@@ -1,7 +1,7 @@
 "use server";
 
+import { SpotifyPlaylistItemsResponse, SpotifyTrack } from "@/types/spotify";
 import { cookies } from "next/headers";
-import { SpotifyTrack, SpotifyPlaylistItemsResponse } from "@/types/spotify";
 
 export const getPlaylistItems = async (
   playlistId: string
@@ -26,12 +26,16 @@ export const getPlaylistItems = async (
   }
 
   const data: SpotifyPlaylistItemsResponse = await response.json();
+  console.log("Response Data:", data);
 
   return data.items.map(({ track }) => ({
     id: track.id,
     name: track.name,
     uri: track.uri,
     duration_ms: track.duration_ms,
-    artists: track.artists.map((artist) => ({ name: artist.name })),
+    artists: track.artists.map((artist) => ({
+      id: artist.id,
+      name: artist.name,
+    })),
   }));
 };

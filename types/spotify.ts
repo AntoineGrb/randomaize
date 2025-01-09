@@ -18,12 +18,25 @@ export interface SpotifyTrack {
   name: string;
   uri: string;
   duration_ms: number;
-  artists: { name: string }[];
+  artists: { id: string; name: string }[];
 }
 
 export interface SpotifyPlaylistItemsResponse {
   items: { track: SpotifyTrack }[];
   total: number;
+}
+
+//Artists
+export interface SpotifyArtistGenre {
+  artistId: string;
+  genres: string[];
+}
+
+export interface SpotifyArtistsResponse {
+  artists: {
+    id: string;
+    genres: string[];
+  }[];
 }
 
 //Audio Features

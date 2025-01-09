@@ -1,12 +1,14 @@
-"use server";
+/! Deprecated sur l'API Spotify, il faut trouver une autre solution externe pour récupérer les features des tracks /;
 
-import { cookies } from "next/headers";
+("use server");
+
 import { AudioFeatures, SpotifyAudioFeaturesResponse } from "@/types/spotify";
+import { cookies } from "next/headers";
 
 export const getTrackAudioFeatures = async (
-  trackIds: string[]
+  trackIds: string
 ): Promise<AudioFeatures[]> => {
-  if (trackIds.length === 0) {
+  if (trackIds === "") {
     throw new Error("No track IDs provided");
   }
 
@@ -16,9 +18,11 @@ export const getTrackAudioFeatures = async (
     throw new Error("No access token found");
   }
 
-  const ids = trackIds.join(",");
+  console.log("Access Token:", accessToken.value);
+  console.log("Track IDs:", trackIds);
+
   const response = await fetch(
-    `https://api.spotify.com/v1/audio-features?ids=${ids}`,
+    `https://api.spotify.com/v1/audio-features?ids=${trackIds}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken.value}`,
@@ -26,11 +30,14 @@ export const getTrackAudioFeatures = async (
     }
   );
 
+  console.log("Response Status:", response.status);
+
   if (!response.ok) {
     throw new Error("Failed to fetch audio features");
   }
 
   const data: SpotifyAudioFeaturesResponse = await response.json();
+  console.log("Response Data:", data);
 
   return data.audio_features.map((feature) => ({
     id: feature.id,

@@ -6,4 +6,11 @@ export interface CustomPlaylist {
   trackCount: number;
 }
 
-export interface CustomTrack {}
+export interface CustomTrack {
+  id: string;
+  name: string;
+  uri: string;
+  duration_ms: number;
+  artists: { id: string; name: string }[];
+  genres: string[];
+}
