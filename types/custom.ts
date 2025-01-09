@@ -5,3 +5,5 @@ export interface CustomPlaylist {
   image: string | null;
   trackCount: number;
 }
+
+export interface CustomTrack {}
