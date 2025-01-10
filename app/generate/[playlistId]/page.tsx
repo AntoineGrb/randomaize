@@ -1,7 +1,6 @@
 // page.tsx
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistItems } from "@/server-actions/spotify/getPlaylistItems";
-import { use } from "react";
 import GenerateClient from "./GenerateClient";
 
 // Fonction pour initialiser les données (côté serveur)
@@ -48,14 +47,13 @@ async function initializePlaylistData(playlistId: string) {
 }
 
 // Server component to generate client side component
-export default function GeneratePage({
+export default async function GeneratePage({
   params,
 }: {
   params: { playlistId: string };
 }) {
-  const playlistId = use(Promise.resolve(params.playlistId));
-  const { playlistItems, customTracks, error } = use(
-    initializePlaylistData(playlistId)
+  const { playlistItems, customTracks, error } = await initializePlaylistData(
+    params.playlistId
   );
 
   return (
