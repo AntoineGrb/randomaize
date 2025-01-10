@@ -4,7 +4,8 @@ import Loader from "@/components/Loader";
 import Toggle from "@/components/Toggle";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksToPlaybackQueue } from "@/server-actions/spotify/addTracksToPlaybackQueue";
-import { playOnActiveDevice } from "@/server-actions/spotify/play";
+import { checkDevice } from "@/server-actions/spotify/checkDevice";
+import { skipToNext } from "@/server-actions/spotify/skipToNext";
 import { CustomTrack } from "@/types/custom";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -32,6 +33,15 @@ export default function GenerateClient({
     setIsGenerating(true);
 
     try {
+      // Check if a device is active
+      const deviceCheck = await checkDevice();
+      if (deviceCheck.error) {
+        toast.error(deviceCheck.error);
+        setIsGenerating(false);
+        return;
+      }
+
+      // Generate tracks
       const generatedTracks = await generateTracklist(
         prompt,
         initialCustomTracks,
@@ -39,7 +49,6 @@ export default function GenerateClient({
       );
       if (generatedTracks.error) {
         toast.error(generatedTracks.error);
-        setPrompt("");
         return;
       }
 
@@ -49,19 +58,21 @@ export default function GenerateClient({
 
       if (!uris || uris.length === 0) {
         toast.error("No tracks generated");
-        setPrompt("");
         return;
       }
 
       await addTracksToPlaybackQueue(uris);
-      await playOnActiveDevice();
-      toast.success("Playback queue successfully updated !");
-      setPrompt("");
+      // Skip au morceau suivant
+      const skipResult = await skipToNext();
+      if (skipResult.error) {
+        toast.error(skipResult.error);
+      } else {
+        toast.success("Playback queue updated and playing the next track!");
+        setPrompt("");
+      }
     } catch (error: any) {
       console.error("Error generating tracklist:", error);
       toast.error("Error generating tracklist: no active device found");
-
-      setPrompt("");
     } finally {
       setIsGenerating(false);
     }
@@ -78,7 +89,11 @@ export default function GenerateClient({
       </p>
       <div>
         <p> Selectionne le nombre de morceaux souhaités: </p>
-        <Toggle value={limit} onChange={setLimit} options={[5, 10, 20, 50]} />
+        <Toggle
+          value={limit}
+          onChange={setLimit}
+          options={[2, 5, 10, 20, 50]}
+        />
       </div>
 
       <form onSubmit={handleSubmit}>
