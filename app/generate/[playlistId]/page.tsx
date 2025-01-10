@@ -1,18 +1,28 @@
 // page.tsx
+import ErrorPage from "@/components/Error";
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistItems } from "@/server-actions/spotify/getPlaylistItems";
-import { CustomTrack } from "@/types/custom";
 import { use } from "react";
 import GenerateClient from "./GenerateClient";
 
 // Fonction pour initialiser les données (côté serveur)
 async function initializePlaylistData(playlistId: string) {
   try {
-    const playlistItems = (await getPlaylistItems(playlistId)).data || [];
-    const artistsIds = playlistItems.map((item) => item.artists[0].id);
-    const artistsGenres = (await getArtistGenres(artistsIds)).data || [];
+    const playlistItemsResponse = await getPlaylistItems(playlistId);
+    if (playlistItemsResponse.error) {
+      throw new Error(playlistItemsResponse.error);
+    }
 
-    const customTracks: CustomTrack[] = playlistItems.map((track) => {
+    const playlistItems = playlistItemsResponse.data || [];
+    const artistsIds = playlistItems.map((item) => item.artists[0].id);
+
+    const artistsGenresResponse = await getArtistGenres(artistsIds);
+    if (artistsGenresResponse.error) {
+      throw new Error(artistsGenresResponse.error);
+    }
+
+    const artistsGenres = artistsGenresResponse.data || [];
+    const customTracks = playlistItems.map((track) => {
       const artistId = track.artists[0].id;
       const artistGenres = artistsGenres.find(
         (artist) => artist.artistId === artistId
@@ -27,33 +37,34 @@ async function initializePlaylistData(playlistId: string) {
       };
     });
 
-    return {
-      playlistItems,
-      customTracks,
-    };
+    return { playlistItems, customTracks };
   } catch (error) {
-    console.error(error);
-    return { playlistItems: [], customTracks: [] };
+    console.error("Error initializing playlist data:", error);
+    return {
+      playlistItems: [],
+      customTracks: [],
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 
-// Composant serveur
+// Server component to generate client side component
 export default function GeneratePage({
   params,
 }: {
   params: { playlistId: string };
 }) {
   const playlistId = use(Promise.resolve(params.playlistId));
-  const { playlistItems, customTracks } = use(
+  const { playlistItems, customTracks, error } = use(
     initializePlaylistData(playlistId)
   );
 
-  if (playlistItems.length === 0 || customTracks.length === 0) {
-    return (
-      <p style={{ color: "red" }}>
-        Failed to load playlist data. Please try again.
-      </p>
-    );
+  if (error) {
+    return <ErrorPage message={`Failed to load playlist: ${error}`} />;
+  }
+
+  if (playlistItems.length === 0) {
+    return <ErrorPage message="This playlist contains no tracks." />;
   }
 
   return (

@@ -5,7 +5,8 @@ import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksToPlaybackQueue } from "@/server-actions/spotify/addTracksToPlaybackQueue";
 import { playOnActiveDevice } from "@/server-actions/spotify/play";
 import { CustomTrack } from "@/types/custom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function GenerateClient({
   initialPlaylistItems,
@@ -16,20 +17,17 @@ export default function GenerateClient({
 }) {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsGenerating(true);
-    setError(null);
-    setSuccessMessage(null);
 
     // Validate prompt
     if (!prompt.trim()) {
-      setError("Prompt cannot be empty.");
+      toast.error("Please enter a prompt");
       return;
     }
+
+    setIsGenerating(true);
 
     try {
       const limit = 10;
@@ -39,8 +37,7 @@ export default function GenerateClient({
         limit
       );
       if (generatedTracks.error) {
-        setError(generatedTracks.error);
-        setSuccessMessage(null);
+        toast.error(generatedTracks.error);
         setPrompt("");
         return;
       }
@@ -50,22 +47,19 @@ export default function GenerateClient({
       const uris = generatedTracks.data?.map((track) => track.uri);
 
       if (!uris || uris.length === 0) {
-        setError("No tracks were generated");
-        setSuccessMessage(null);
+        toast.error("No tracks generated");
         setPrompt("");
         return;
       }
 
       await addTracksToPlaybackQueue(uris);
-      setSuccessMessage("Adding tracks to the playback queue...");
-
       await playOnActiveDevice();
-      setSuccessMessage("Tracks added to queue and playback started !");
+      toast.success("Playback queue successfully updated !");
       setPrompt("");
     } catch (error: any) {
       console.error("Error generating tracklist:", error);
-      setError(`An error occurred while generating the tracklist on device`);
-      setSuccessMessage(null);
+      toast.error("Error generating tracklist: no active device found");
+
       setPrompt("");
     } finally {
       setIsGenerating(false);
@@ -81,8 +75,6 @@ export default function GenerateClient({
         Les sons seront ajoutés à la suite de la file d'attente actuelle. Penser
         à la vider le cas échéant.{" "}
       </p>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
 
       <form onSubmit={handleSubmit}>
         <textarea
