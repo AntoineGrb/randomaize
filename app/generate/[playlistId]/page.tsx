@@ -1,27 +1,16 @@
-import { generateTracklist } from "@/server-actions/openai/generateTracklist";
+// page.tsx
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistItems } from "@/server-actions/spotify/getPlaylistItems";
 import { CustomTrack } from "@/types/custom";
+import { use } from "react";
+import GenerateClient from "./GenerateClient";
 
-export default async function GeneratePage({
-  params,
-}: {
-  params: { playlistId: string };
-}) {
-  const playlistId = params.playlistId;
-
-  //Get playlist items
+// Fonction pour initialiser les données (côté serveur)
+async function initializePlaylistData(playlistId: string) {
   const playlistItems = await getPlaylistItems(playlistId);
-  console.log("tracks", playlistItems);
-
-  //Get genres for each track
   const artistsIds = playlistItems.map((item) => item.artists[0].id);
   const artistsGenres = await getArtistGenres(artistsIds);
-  console.log("genres", artistsGenres);
 
-  //TODO: étudier l'ajout d'audio features via API externes (AcousticBrainz, Kaggle)
-
-  //Set custom track's object
   const customTracks: CustomTrack[] = playlistItems.map((track) => {
     const artistId = track.artists[0].id;
     const artistGenres = artistsGenres.find(
@@ -36,32 +25,28 @@ export default async function GeneratePage({
       duration_ms: track.duration_ms,
     };
   });
-  console.log("customTracks", customTracks);
-  const userPrompt = "Je veux des sons électro mélodiques";
-  const limit = 15;
 
-  //Generate tracklist with OpenAI
-  const generatedTracks = await generateTracklist(
-    userPrompt,
+  return {
+    playlistItems,
     customTracks,
-    limit
+  };
+}
+
+// Composant serveur
+export default function GeneratePage({
+  params,
+}: {
+  params: { playlistId: string };
+}) {
+  const playlistId = use(Promise.resolve(params.playlistId));
+  const { playlistItems, customTracks } = use(
+    initializePlaylistData(playlistId)
   );
-  console.log("generatedTracks", generatedTracks);
 
   return (
-    <div>
-      <h1>Generate</h1>
-      <p>Playlist contains {playlistItems.length} tracks</p>
-
-      <form>
-        <textarea
-          name="prompt"
-          placeholder="Enter your prompt here"
-          rows={5}
-          cols={50}
-        />
-        <button type="submit">Generate</button>
-      </form>
-    </div>
+    <GenerateClient
+      initialPlaylistItems={playlistItems}
+      initialCustomTracks={customTracks}
+    />
   );
 }

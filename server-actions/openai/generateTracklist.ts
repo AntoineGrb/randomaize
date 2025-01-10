@@ -29,12 +29,15 @@ export const generateTracklist = async (
 
   const headPrompt = `Tu es un assistant musical qui analyse des playlists et sélectionne des morceaux selon des critères spécifiques. Ton objectif est de proposer une liste de morceaux répondant au mieux au contexte, en utilisant les données fournies sur chaque morceau. À partir de la playlist transmise ci-dessous, tu devras:
   1. Identifier les morceaux correspondant aux critères définis dans la demande.
-  2. Trier aléatoirement les morceaux pertinents.
-  3. Retourner les morceaux pertinents. Si le nombre de morceaux pertinents est inférieur à la limite demandée, tu peux compléter la liste par d'autres morceaux de la playlist choisis aléatoirement. Si la playlist ne comporte pas assez de morceaux pour compléter jusqu'à la limite, tu retourneras le maximum de morceaux possibles. L'important est que les morceaux pertinents soient retournés en premier.
+  2. Trier aléatoirement les morceaux pertinents. 
+  3. Si le nombre de morceaux pertinents est inférieur au nombre de morceaux souhaités, complètes la liste par des morceaux complémentaires choisis aléatoirement dans la playlist transmise.
+  4. Retourne les morceaux pertinents en premier, et à la suite les éventuels morceaux complémentaires.
   Ta réponse doit contenir uniquement un tableau JSON d'objets avec le nom et l'uri du morceau. Tout texte supplémentaire est interdit.
-  Le contexte, la playlist et la limite seront fournis dans chaque requête.`;
+  Le contexte, la playlist et le nombre de morceaux souhaités seront fournis dans chaque requête.`;
 
-  const contextPrompt = `Contexte: ${userPrompt}. Playlist: ${formattedPlaylist}. Limite: ${limit}.`;
+  const contextPrompt = `Contexte: ${userPrompt}. Nombre de morceaux souhaités: ${limit}. Playlist: ${formattedPlaylist}.`;
+
+  console.log("Context Prompt:", contextPrompt);
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
