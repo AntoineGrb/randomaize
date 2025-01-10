@@ -14,3 +14,8 @@ export interface CustomTrack {
   artists: { id: string; name: string }[];
   genres: string[];
 }
+
+export interface CustomTrackReturnedByAI {
+  uri: string;
+  name: string; //TODO : à  retirer
+}

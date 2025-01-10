@@ -1,3 +1,4 @@
+import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistItems } from "@/server-actions/spotify/getPlaylistItems";
 import { CustomTrack } from "@/types/custom";
@@ -18,6 +19,8 @@ export default async function GeneratePage({
   const artistsGenres = await getArtistGenres(artistsIds);
   console.log("genres", artistsGenres);
 
+  //TODO: étudier l'ajout d'audio features via API externes (AcousticBrainz, Kaggle)
+
   //Set custom track's object
   const customTracks: CustomTrack[] = playlistItems.map((track) => {
     const artistId = track.artists[0].id;
@@ -34,6 +37,16 @@ export default async function GeneratePage({
     };
   });
   console.log("customTracks", customTracks);
+  const userPrompt = "Je veux des sons électro mélodiques";
+  const limit = 15;
+
+  //Generate tracklist with OpenAI
+  const generatedTracks = await generateTracklist(
+    userPrompt,
+    customTracks,
+    limit
+  );
+  console.log("generatedTracks", generatedTracks);
 
   return (
     <div>
