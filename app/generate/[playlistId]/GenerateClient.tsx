@@ -1,5 +1,6 @@
 "use client";
 
+import Loader from "@/components/Loader";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksToPlaybackQueue } from "@/server-actions/spotify/addTracksToPlaybackQueue";
 import { playOnActiveDevice } from "@/server-actions/spotify/play";
@@ -40,27 +41,32 @@ export default function GenerateClient({
       if (generatedTracks.error) {
         setError(generatedTracks.error);
         setSuccessMessage(null);
+        setPrompt("");
         return;
       }
 
       console.log("OpenAI Response - Generated tracks:", generatedTracks);
 
       const uris = generatedTracks.data?.map((track) => track.uri);
-      console.log("Uris to add:", uris);
+
       if (!uris || uris.length === 0) {
         setError("No tracks were generated");
         setSuccessMessage(null);
+        setPrompt("");
         return;
       }
 
       await addTracksToPlaybackQueue(uris);
       setSuccessMessage("Adding tracks to the playback queue...");
+
       await playOnActiveDevice();
       setSuccessMessage("Tracks added to queue and playback started !");
+      setPrompt("");
     } catch (error: any) {
       console.error("Error generating tracklist:", error);
       setError(`An error occurred while generating the tracklist on device`);
       setSuccessMessage(null);
+      setPrompt("");
     } finally {
       setIsGenerating(false);
     }
@@ -90,6 +96,7 @@ export default function GenerateClient({
         <button type="submit" disabled={isGenerating}>
           {isGenerating ? "Generating..." : "Generate"}
         </button>
+        {isGenerating && <Loader />}
       </form>
     </div>
   );
