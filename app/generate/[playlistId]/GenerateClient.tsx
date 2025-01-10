@@ -14,32 +14,53 @@ export default function GenerateClient({
   initialCustomTracks: CustomTrack[];
 }) {
   const [prompt, setPrompt] = useState("");
-  const [generatedTracks, setGeneratedTracks] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
     setError(null);
-    console.log("Starting generation with prompt:", prompt);
+    setSuccessMessage(null);
+
+    // Validate prompt
+    if (!prompt.trim()) {
+      setError("Prompt cannot be empty.");
+      return;
+    }
 
     try {
       const limit = 10;
-      const generated = await generateTracklist(
+      const generatedTracks = await generateTracklist(
         prompt,
         initialCustomTracks,
         limit
       );
-      console.log("OpenAI Response - Generated tracks:", generated);
+      if (generatedTracks.error) {
+        setError(generatedTracks.error);
+        setSuccessMessage(null);
+        return;
+      }
 
-      const uris = generated.map((track) => track.uri);
+      console.log("OpenAI Response - Generated tracks:", generatedTracks);
+
+      const uris = generatedTracks.data?.map((track) => track.uri);
       console.log("Uris to add:", uris);
+      if (!uris || uris.length === 0) {
+        setError("No tracks were generated");
+        setSuccessMessage(null);
+        return;
+      }
+
       await addTracksToPlaybackQueue(uris);
+      setSuccessMessage("Adding tracks to the playback queue...");
       await playOnActiveDevice();
-    } catch (error) {
+      setSuccessMessage("Tracks added to queue and playback started !");
+    } catch (error: any) {
       console.error("Error generating tracklist:", error);
-      setError("An error occurred while generating the tracklist");
+      setError(`An error occurred while generating the tracklist on device`);
+      setSuccessMessage(null);
     } finally {
       setIsGenerating(false);
     }
@@ -55,6 +76,7 @@ export default function GenerateClient({
         à la vider le cas échéant.{" "}
       </p>
       {error && <p style={{ color: "red" }}>{error}</p>}
+      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
 
       <form onSubmit={handleSubmit}>
         <textarea
