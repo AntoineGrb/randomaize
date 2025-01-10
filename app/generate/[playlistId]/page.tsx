@@ -3,11 +3,8 @@ import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistItems } from "@/server-actions/spotify/getPlaylistItems";
 import GenerateClient from "./GenerateClient";
 
-interface GeneratePageProps {
-  params: {
-    playlistId: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
+interface PageProps {
+  params: Promise<{ playlistId: string }>;
 }
 
 // Fonction pour initialiser les données (côté serveur)
@@ -54,11 +51,8 @@ async function initializePlaylistData(playlistId: string) {
 }
 
 // Server component to generate client side component
-export default async function GeneratePage({
-  params,
-  searchParams,
-}: GeneratePageProps) {
-  const { playlistId } = params;
+export default async function GeneratePage({ params }: PageProps) {
+  const { playlistId } = await params;
   const { playlistItems, customTracks, error } = await initializePlaylistData(
     playlistId
   );
