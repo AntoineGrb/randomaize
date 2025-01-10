@@ -1,5 +1,4 @@
 // page.tsx
-import ErrorPage from "@/components/Error";
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistItems } from "@/server-actions/spotify/getPlaylistItems";
 import { use } from "react";
@@ -58,14 +57,6 @@ export default function GeneratePage({
   const { playlistItems, customTracks, error } = use(
     initializePlaylistData(playlistId)
   );
-
-  if (error) {
-    return <ErrorPage message={`Failed to load playlist: ${error}`} />;
-  }
-
-  if (playlistItems.length === 0) {
-    return <ErrorPage message="This playlist contains no tracks." />;
-  }
 
   return (
     <GenerateClient

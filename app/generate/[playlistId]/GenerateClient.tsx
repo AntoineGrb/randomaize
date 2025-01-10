@@ -1,11 +1,12 @@
 "use client";
 
 import Loader from "@/components/Loader";
+import Toggle from "@/components/Toggle";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksToPlaybackQueue } from "@/server-actions/spotify/addTracksToPlaybackQueue";
 import { playOnActiveDevice } from "@/server-actions/spotify/play";
 import { CustomTrack } from "@/types/custom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function GenerateClient({
@@ -17,6 +18,7 @@ export default function GenerateClient({
 }) {
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [limit, setLimit] = useState(10);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +32,6 @@ export default function GenerateClient({
     setIsGenerating(true);
 
     try {
-      const limit = 10;
       const generatedTracks = await generateTracklist(
         prompt,
         initialCustomTracks,
@@ -75,6 +76,10 @@ export default function GenerateClient({
         Les sons seront ajoutés à la suite de la file d'attente actuelle. Penser
         à la vider le cas échéant.{" "}
       </p>
+      <div>
+        <p> Selectionne le nombre de morceaux souhaités: </p>
+        <Toggle value={limit} onChange={setLimit} options={[5, 10, 20, 50]} />
+      </div>
 
       <form onSubmit={handleSubmit}>
         <textarea
