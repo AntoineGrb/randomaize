@@ -50,10 +50,11 @@ async function initializePlaylistData(playlistId: string) {
 export default async function GeneratePage({
   params,
 }: {
-  params: { playlistId: string };
+  params: Record<string, string>;
 }) {
+  const { playlistId } = params;
   const { playlistItems, customTracks, error } = await initializePlaylistData(
-    params.playlistId
+    playlistId
   );
 
   return (
