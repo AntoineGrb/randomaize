@@ -9,68 +9,86 @@ export const generateTracklist = async (
   userPrompt: string,
   playlist: CustomTrack[],
   limit: number
-): Promise<CustomTrackReturnedByAI[]> => {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("spotify_access_token");
-  if (!accessToken) {
-    throw new Error("No access token found");
-  }
-
-  const apiKey = process.env.OPENAI_API_KEY;
-
-  const formattedPlaylist = playlist
-    .map(
-      (track) =>
-        `Nom: ${track.name}; Artists: ${track.artists.join(
-          ","
-        )}; Genres: ${track.genres.join(",")}; Uri: ${track.uri}`
-    )
-    .join("\n");
-
-  const headPrompt = `Tu es un assistant musical qui analyse des playlists et sélectionne des morceaux selon des critères spécifiques. Ton objectif est de proposer une liste de morceaux répondant au mieux au contexte, en utilisant les données fournies sur chaque morceau. À partir de la playlist transmise ci-dessous, tu devras:
-  1. Identifier les morceaux correspondant aux critères définis dans la demande.
-  2. Trier aléatoirement les morceaux pertinents.
-  3. Retourner les morceaux pertinents. Si le nombre de morceaux pertinents est inférieur à la limite demandée, tu peux compléter la liste par d'autres morceaux de la playlist choisis aléatoirement. Si la playlist ne comporte pas assez de morceaux pour compléter jusqu'à la limite, tu retourneras le maximum de morceaux possibles. L'important est que les morceaux pertinents soient retournés en premier.
-  Ta réponse doit contenir uniquement un tableau JSON d'objets avec le nom et l'uri du morceau. Tout texte supplémentaire est interdit.
-  Le contexte, la playlist et la limite seront fournis dans chaque requête.`;
-
-  const contextPrompt = `Contexte: ${userPrompt}. Playlist: ${formattedPlaylist}. Limite: ${limit}.`;
-
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "system", content: headPrompt },
-        { role: "user", content: contextPrompt },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch playlist items");
-  }
-
-  const openAIResponse: OpenAIResponse = await response.json();
-  console.log("OpenAiReponse:", openAIResponse);
-
-  const content = openAIResponse.choices[0]?.message.content;
-  if (!content) {
-    throw new Error("No content found in OpenAI response");
-  }
-  let data: CustomTrackReturnedByAI[];
-
+): Promise<{ data?: CustomTrackReturnedByAI[]; error?: string }> => {
   try {
-    data = validateJSONOutput(content);
-  } catch (error: any) {
-    console.error("Validation Error:", error.message);
-    console.error("Full Response Content for Debugging:", content);
-    throw new Error("The response from OpenAI is not valid JSON.");
-  }
+    // Get the access token
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("spotify_access_token");
+    if (!accessToken) {
+      throw new Error("No access token found");
+    }
 
-  return data;
+    // Get the OpenAI API key
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error("OpenAI API key is missing.");
+    }
+
+    // Prepare prompt
+    const formattedPlaylist = playlist
+      .map(
+        (track) =>
+          `Nom: ${track.name}; Artists: ${track.artists.join(
+            ","
+          )}; Genres: ${track.genres.join(",")}; Uri: ${track.uri}`
+      )
+      .join("\n");
+
+    const headPrompt = `Tu es un assistant musical qui analyse des playlists et sélectionne des morceaux selon des critères spécifiques. Ton objectif est de proposer une liste de morceaux répondant au mieux au contexte, en utilisant les données fournies sur chaque morceau. À partir de la playlist transmise ci-dessous, tu devras:
+  1. Identifier les morceaux correspondant aux critères définis dans la demande.
+  2. Trier aléatoirement les morceaux pertinents. 
+  3. Si le nombre de morceaux pertinents est inférieur au nombre de morceaux souhaités, complètes la liste par des morceaux complémentaires choisis aléatoirement dans la playlist transmise.
+  4. Retourne les morceaux pertinents en premier, et à la suite les éventuels morceaux complémentaires.
+  Ta réponse doit contenir uniquement un tableau JSON d'objets avec le nom et l'uri du morceau. Tout texte supplémentaire est interdit.
+  Le contexte, la playlist et le nombre de morceaux souhaités seront fournis dans chaque requête.`;
+
+    const contextPrompt = `Contexte: ${userPrompt}. Nombre de morceaux souhaités: ${limit}. Playlist: ${formattedPlaylist}.`;
+
+    console.log("Context Prompt:", contextPrompt);
+
+    // Call OpenAI API
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: headPrompt },
+          { role: "user", content: contextPrompt },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch playlist items");
+    }
+
+    const openAIResponse: OpenAIResponse = await response.json();
+    console.log("OpenAiReponse:", openAIResponse);
+
+    const content = openAIResponse.choices[0]?.message.content;
+    if (!content) {
+      throw new Error("No content found in OpenAI response");
+    }
+
+    // Validate the JSON output
+    let data: CustomTrackReturnedByAI[];
+    try {
+      data = validateJSONOutput(content);
+    } catch (error: any) {
+      console.error("Validation Error:", error.message);
+      console.error("Full Response Content for Debugging:", content);
+      throw new Error("The response from OpenAI is not valid JSON.");
+    }
+
+    return { data };
+  } catch (error) {
+    console.error("Error in generateTracklist:", error);
+    return {
+      error: error instanceof Error ? error.message : "Unknown error occurred.",
+    };
+  }
 };
