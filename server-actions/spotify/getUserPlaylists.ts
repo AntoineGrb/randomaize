@@ -1,6 +1,5 @@
 "use server";
 
-import { CustomPlaylist } from "@/types/custom";
 import { SpotifyPlaylist } from "@/types/spotify";
 import { cookies } from "next/headers";
 

@@ -1,4 +1,4 @@
-import { getUserPlaylists } from "@/server-actions/spotify/getPlaylists";
+import { getUserPlaylists } from "@/server-actions/spotify/getUserPlaylists";
 import { CustomPlaylist } from "@/types/custom";
 import Link from "next/link";
 

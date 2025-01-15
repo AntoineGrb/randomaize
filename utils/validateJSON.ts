@@ -1,3 +1,4 @@
+//! Depracated : THe response format is not JSON anymore but array of uriss
 import { CustomTrackReturnedByAI } from "@/types/custom";
 
 export const validateJSONOutput = (

@@ -3,9 +3,8 @@
 import Loader from "@/components/Loader";
 import Toggle from "@/components/Toggle";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
-import { addTracksToPlaybackQueue } from "@/server-actions/spotify/addTracksToPlaybackQueue";
+import { addTracksAndPlay } from "@/server-actions/spotify/addTracksAndPlay";
 import { checkDevice } from "@/server-actions/spotify/checkDevice";
-import { skipToNext } from "@/server-actions/spotify/skipToNext";
 import { CustomTrack } from "@/types/custom";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -52,22 +51,19 @@ export default function GenerateClient({
         return;
       }
 
-      console.log("OpenAI Response - Generated tracks:", generatedTracks);
-
-      const uris = generatedTracks.data?.map((track) => track.uri);
+      console.log("Client side - Generated tracks:", generatedTracks);
+      const uris = generatedTracks.data;
 
       if (!uris || uris.length === 0) {
         toast.error("No tracks generated");
         return;
       }
 
-      await addTracksToPlaybackQueue(uris);
-      // Skip au morceau suivant
-      const skipResult = await skipToNext();
-      if (skipResult.error) {
-        toast.error(skipResult.error);
+      const play = await addTracksAndPlay(uris);
+      if (play.error) {
+        toast.error(play.error);
       } else {
-        toast.success("Playback queue updated and playing the next track!");
+        toast.success("Tracks added and played on your Spotify device !");
         setPrompt("");
       }
     } catch (error: any) {

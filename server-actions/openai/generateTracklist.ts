@@ -1,15 +1,15 @@
 "use server";
 
-import { CustomTrack, CustomTrackReturnedByAI } from "@/types/custom";
+import { CustomTrack } from "@/types/custom";
 import { OpenAIResponse } from "@/types/openai";
-import { validateJSONOutput } from "@/utils/validateJSON";
+import { validateAiResponse } from "@/utils/validateAiResponse";
 import { cookies } from "next/headers";
 
 export const generateTracklist = async (
   userPrompt: string,
   playlist: CustomTrack[],
   limit: number
-): Promise<{ data?: CustomTrackReturnedByAI[]; error?: string }> => {
+): Promise<{ data?: string[]; error?: string }> => {
   try {
     // Get the access token
     const cookieStore = await cookies();
@@ -34,13 +34,12 @@ export const generateTracklist = async (
       )
       .join("\n");
 
-    const headPrompt = `Tu es un assistant musical qui analyse des playlists et sélectionne des morceaux selon des critères spécifiques. Ton objectif est de proposer une liste de morceaux répondant au mieux au contexte, en utilisant les données fournies sur chaque morceau. À partir de la playlist transmise ci-dessous, tu devras:
+    const headPrompt = `Tu es un assistant musical qui analyse des playlists et sélectionne des morceaux selon des critères spécifiques. Ton objectif est de proposer une liste de morceaux répondant au mieux au contexte, en utilisant les données fournies sur chaque morceau. À partir du contexte, de la playlist et du nombre de morceaux transmis ci-dessous, tu devras:
   1. Identifier les morceaux correspondant aux critères définis dans la demande.
   2. Trier aléatoirement les morceaux pertinents. 
   3. Si le nombre de morceaux pertinents est inférieur au nombre de morceaux souhaités, complètes la liste par des morceaux complémentaires choisis aléatoirement dans la playlist transmise.
   4. Retourne les morceaux pertinents en premier, et à la suite les éventuels morceaux complémentaires.
-  Ta réponse doit contenir uniquement un tableau JSON d'objets avec le nom et l'uri du morceau. Tout texte supplémentaire est interdit.
-  Le contexte, la playlist et le nombre de morceaux souhaités seront fournis dans chaque requête.`;
+  Ta réponse doit contenir uniquement un tableau d'uris. Tout texte supplémentaire est interdit. Exemple : ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"].`;
 
     const contextPrompt = `Contexte: ${userPrompt}. Nombre de morceaux souhaités: ${limit}. Playlist: ${formattedPlaylist}.`;
 
@@ -67,7 +66,10 @@ export const generateTracklist = async (
     }
 
     const openAIResponse: OpenAIResponse = await response.json();
-    console.log("OpenAiReponse:", openAIResponse);
+    console.log(
+      "!!!! OpenAiReponse:",
+      openAIResponse.choices[0]?.message.content
+    );
 
     const content = openAIResponse.choices[0]?.message.content;
     if (!content) {
@@ -75,16 +77,11 @@ export const generateTracklist = async (
     }
 
     // Validate the JSON output
-    let data: CustomTrackReturnedByAI[];
-    try {
-      data = validateJSONOutput(content);
-    } catch (error: any) {
-      console.error("Validation Error:", error.message);
-      console.error("Full Response Content for Debugging:", content);
-      throw new Error("The response from OpenAI is not valid JSON.");
+    if (!validateAiResponse(content)) {
+      throw new Error("Invalid JSON output from OpenAI");
     }
 
-    return { data };
+    return { data: JSON.parse(content) };
   } catch (error) {
     console.error("Error in generateTracklist:", error);
     return {
