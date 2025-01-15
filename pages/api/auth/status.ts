@@ -19,18 +19,18 @@ export default async function handler(
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch user data");
+      const errorText = await response.text();
+      console.error("Failed to fetch user data:", errorText);
+      return res.status(response.status).json({ isLoggedIn: false });
     }
 
     const userData = await response.json();
     return res.status(200).json({ isLoggedIn: true, user: userData });
   } catch (error) {
     console.error("Error fetching user data", error);
-    return res
-      .status(500)
-      .json({
-        isLoggedIn: false,
-        error: "Failed to fetch user data from Spotify",
-      });
+    return res.status(500).json({
+      isLoggedIn: false,
+      error: "Failed to fetch user data from Spotify",
+    });
   }
 }

@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 
+import { AuthProvider } from "@/context/AuthContext";
 import "react-toastify/dist/ReactToastify.css"; // Import des styles par défaut de react-toastify
 import "./globals.css";
 
@@ -36,11 +37,13 @@ export default function RootLayout({
       <body
         className={`bg-black text-white h-[100dvh] w-full m-0 p-0 ${geistSans.variable} ${geistMono.variable} ${inter.variable} overflow-hidden  antialiased`}
       >
-        <Header />
-        <main className="w-full h-[100dvh] *">
-          {children}
-          <Toaster />
-        </main>
+        <AuthProvider>
+          <Header />
+          <main className="w-full h-[100dvh] *">
+            {children}
+            <Toaster />
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );
