@@ -107,30 +107,27 @@ export default function GenerateClient({
   };
 
   return (
-    <div className="px-4 py-48">
-      <h1 className="mb-6 text-center">Que veux-tu écouter ? </h1>
+    <div className="px-4 py-24">
+      <div className="flex gap-2 justify-start items-center mb-24">
+        {initialPlaylistInfos.image && (
+          <img
+            src={initialPlaylistInfos.image}
+            alt={initialPlaylistInfos.name}
+            className="w-10 h-10 rounded"
+          />
+        )}
+        <p>{initialPlaylistInfos.name} </p>
+      </div>
+      <h1 className="mb-4 text-center">Que veux-tu écouter ? </h1>
       <form onSubmit={handleSubmit}>
         <Textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           placeholder="Je veux des sons calmes, de la techno minimale..."
+          className="mb-6"
         />
-        <div className="flex gap-2 justify-start items-center">
-          <p> Playlist : </p>
-          {initialPlaylistInfos.image && (
-            <img
-              src={initialPlaylistInfos.image}
-              alt={initialPlaylistInfos.name}
-              className="w-10 h-10 rounded"
-            />
-          )}
-          <p>
-            {initialPlaylistInfos.name}{" "}
-            <small>({initialPlaylistInfos.nbTracks} tracks)</small>
-          </p>
-        </div>
-        <div className="flex gap-2 justify-start items-center">
-          <p> Nb tracks : </p>
+        <div className="flex gap-2 justify-start items-center mb-4">
+          <p> Morceaux souhaités : </p>
           <ToggleGroup
             type="single"
             variant="outline"
@@ -145,10 +142,12 @@ export default function GenerateClient({
             <ToggleGroupItem value="50">50</ToggleGroupItem>
           </ToggleGroup>
         </div>
-        <Button type="submit" disabled={isGenerating}>
-          {isGenerating ? "Generating..." : "Generate"}
-          {isGenerating && <Loader2 className="animate-spin" />}
-        </Button>
+        <div className="flex justify-center">
+          <Button type="submit" disabled={isGenerating}>
+            {isGenerating ? "Generating..." : "Generate"}
+            {isGenerating && <Loader2 className="animate-spin" />}
+          </Button>
+        </div>
       </form>
     </div>
   );
