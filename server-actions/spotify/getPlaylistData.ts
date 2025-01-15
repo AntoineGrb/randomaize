@@ -1,11 +1,15 @@
 "use server";
 
-import { SpotifyPlaylistResponse, SpotifyTrack } from "@/types/spotify";
+import { CustomPlaylistDataResponse } from "@/types/custom";
+import { SpotifyPlaylistResponse } from "@/types/spotify";
 import { cookies } from "next/headers";
 
-export const getPlaylistItems = async (
+export const getPlaylistData = async (
   playlistId: string
-): Promise<{ data?: SpotifyTrack[]; error?: string }> => {
+): Promise<{
+  data?: CustomPlaylistDataResponse;
+  error?: string;
+}> => {
   try {
     //Verify input
     if (!playlistId) {
@@ -21,7 +25,7 @@ export const getPlaylistItems = async (
 
     //Call Spotify API
     const response = await fetch(
-      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+      `https://api.spotify.com/v1/playlists/${playlistId}`,
       {
         headers: {
           Authorization: `Bearer ${accessToken.value}`,
@@ -35,8 +39,15 @@ export const getPlaylistItems = async (
 
     const data: SpotifyPlaylistResponse = await response.json();
 
+    const infos = {
+      id: data.id,
+      name: data.name,
+      image: data.images.length > 0 ? data.images[0].url : null,
+      nbTracks: data.tracks.total,
+    };
+
     //Transform data
-    const tracks = data.items.map(({ track }) => ({
+    const tracks = data.tracks.items.map(({ track }) => ({
       id: track.id,
       name: track.name,
       uri: track.uri,
@@ -47,7 +58,7 @@ export const getPlaylistItems = async (
       })),
     }));
 
-    return { data: tracks };
+    return { data: { infos, tracks } };
   } catch (error) {
     console.error(error);
     return { error: error instanceof Error ? error.message : "Unknown error" };

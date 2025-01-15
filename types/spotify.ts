@@ -12,6 +12,17 @@ export interface SpotifyPlaylistsResponse {
   total: number;
 }
 
+export interface SpotifyPlaylistResponse {
+  id: string;
+  name: string;
+  description: string;
+  images: { url: string; height?: number; width?: number }[];
+  tracks: {
+    total: number;
+    items: { track: SpotifyTrack }[];
+  };
+}
+
 //Tracks
 export interface SpotifyTrack {
   id: string;
@@ -19,11 +30,6 @@ export interface SpotifyTrack {
   uri: string;
   duration_ms: number;
   artists: { id: string; name: string }[];
-}
-
-export interface SpotifyPlaylistItemsResponse {
-  items: { track: SpotifyTrack }[];
-  total: number;
 }
 
 //Artists

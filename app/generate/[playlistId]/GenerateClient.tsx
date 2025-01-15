@@ -7,15 +7,15 @@ import { useToast } from "@/hooks/use-toast";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksAndPlay } from "@/server-actions/spotify/addTracksAndPlay";
 import { checkDevice } from "@/server-actions/spotify/checkDevice";
-import { CustomTrack } from "@/types/custom";
+import { CustomPlaylistDataResponse, CustomTrack } from "@/types/custom";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
 export default function GenerateClient({
-  initialPlaylistItems,
+  initialPlaylistInfos,
   initialCustomTracks,
 }: {
-  initialPlaylistItems: any[];
+  initialPlaylistInfos: CustomPlaylistDataResponse["infos"];
   initialCustomTracks: CustomTrack[];
 }) {
   const [prompt, setPrompt] = useState("");
@@ -107,45 +107,49 @@ export default function GenerateClient({
   };
 
   return (
-    <>
-      <div>
-        <h1>Que veux-tu écouter ? </h1>
-        <form onSubmit={handleSubmit}>
-          <Textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Je veux des sons calmes..."
-          />
-          <div className="flex gap-2 justify-start items-center">
-            <p> Playlist : </p>
-            <p> Photo </p>
-            <p>
-              {" "}
-              Nom <small>({initialPlaylistItems.length} tracks)</small>
-            </p>
-          </div>
-          <div className="flex gap-2 justify-start items-center">
-            <p> Nb tracks : </p>
-            <ToggleGroup
-              type="single"
-              variant="outline"
-              size="lg"
-              value={limit.toString()}
-              defaultValue="10"
-              onValueChange={(value) => setLimit(parseInt(value))}
-            >
-              <ToggleGroupItem value="2">2</ToggleGroupItem>
-              <ToggleGroupItem value="10">10</ToggleGroupItem>
-              <ToggleGroupItem value="20">20</ToggleGroupItem>
-              <ToggleGroupItem value="50">50</ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-          <Button type="submit" disabled={isGenerating}>
-            {isGenerating ? "Generating..." : "Generate"}
-            {isGenerating && <Loader2 className="animate-spin" />}
-          </Button>
-        </form>
-      </div>
-    </>
+    <div className="px-4 py-48">
+      <h1 className="mb-6 text-center">Que veux-tu écouter ? </h1>
+      <form onSubmit={handleSubmit}>
+        <Textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Je veux des sons calmes, de la techno minimale..."
+        />
+        <div className="flex gap-2 justify-start items-center">
+          <p> Playlist : </p>
+          {initialPlaylistInfos.image && (
+            <img
+              src={initialPlaylistInfos.image}
+              alt={initialPlaylistInfos.name}
+              className="w-10 h-10 rounded"
+            />
+          )}
+          <p>
+            {initialPlaylistInfos.name}{" "}
+            <small>({initialPlaylistInfos.nbTracks} tracks)</small>
+          </p>
+        </div>
+        <div className="flex gap-2 justify-start items-center">
+          <p> Nb tracks : </p>
+          <ToggleGroup
+            type="single"
+            variant="outline"
+            size="lg"
+            value={limit.toString()}
+            defaultValue="10"
+            onValueChange={(value) => setLimit(parseInt(value))}
+          >
+            <ToggleGroupItem value="2">2</ToggleGroupItem>
+            <ToggleGroupItem value="10">10</ToggleGroupItem>
+            <ToggleGroupItem value="20">20</ToggleGroupItem>
+            <ToggleGroupItem value="50">50</ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+        <Button type="submit" disabled={isGenerating}>
+          {isGenerating ? "Generating..." : "Generate"}
+          {isGenerating && <Loader2 className="animate-spin" />}
+        </Button>
+      </form>
+    </div>
   );
 }

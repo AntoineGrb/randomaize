@@ -1,22 +1,27 @@
 // page.tsx
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
-import { getPlaylistItems } from "@/server-actions/spotify/getPlaylistItems";
+import { getPlaylistData } from "@/server-actions/spotify/getPlaylistData";
 import GenerateClient from "./GenerateClient";
+import { CustomPlaylistDataResponse, CustomTrack } from "@/types/custom";
 
 interface PageProps {
   params: Promise<{ playlistId: string }>;
 }
 
 // Fonction pour initialiser les données (côté serveur)
-async function initializePlaylistData(playlistId: string) {
+async function initializePlaylistData(playlistId: string): Promise<{
+  playlistInfos: CustomPlaylistDataResponse["infos"];
+  customTracks: CustomTrack[];
+}> {
   try {
-    const playlistItemsResponse = await getPlaylistItems(playlistId);
-    if (playlistItemsResponse.error) {
-      throw new Error(playlistItemsResponse.error);
+    const playlistResponse = await getPlaylistData(playlistId);
+    if (playlistResponse.error) {
+      throw new Error(playlistResponse.error);
     }
 
-    const playlistItems = playlistItemsResponse.data || [];
-    const artistsIds = playlistItems.map((item) => item.artists[0].id);
+    const playlistInfos = playlistResponse.data?.infos;
+    const playlistTracks = playlistResponse.data?.tracks || [];
+    const artistsIds = playlistTracks.map((item) => item.artists[0].id);
 
     const artistsGenresResponse = await getArtistGenres(artistsIds);
     if (artistsGenresResponse.error) {
@@ -24,7 +29,9 @@ async function initializePlaylistData(playlistId: string) {
     }
 
     const artistsGenres = artistsGenresResponse.data || [];
-    const customTracks = playlistItems.map((track) => {
+
+    // Transform data to custom track format
+    const customTracks = playlistTracks.map((track) => {
       const artistId = track.artists[0].id;
       const artistGenres = artistsGenres.find(
         (artist) => artist.artistId === artistId
@@ -39,27 +46,23 @@ async function initializePlaylistData(playlistId: string) {
       };
     });
 
-    return { playlistItems, customTracks };
+    return { playlistInfos: playlistInfos!, customTracks };
   } catch (error) {
     console.error("Error initializing playlist data:", error);
-    return {
-      playlistItems: [],
-      customTracks: [],
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
+    throw error;
   }
 }
 
 // Server component to generate client side component
 export default async function GeneratePage({ params }: PageProps) {
   const { playlistId } = await params;
-  const { playlistItems, customTracks, error } = await initializePlaylistData(
+  const { playlistInfos, customTracks } = await initializePlaylistData(
     playlistId
   );
 
   return (
     <GenerateClient
-      initialPlaylistItems={playlistItems}
+      initialPlaylistInfos={playlistInfos}
       initialCustomTracks={customTracks}
     />
   );
