@@ -6,9 +6,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>Connectez-vous à Spotify</h1>
-      <button onClick={handleLogin}>Se connecter</button>
+    <div className="flex flex-col items-center justify-center w-full h-full text-center">
+      <p className="text-center pb-4">
+        Utilise l'IA pour générer une liste de lecture personnalisée !
+      </p>
+      <button
+        onClick={handleLogin}
+        className=" w-48 py-3 mb-8 rounded-3xl bg-green-700 hover:bg-green-800 text-white"
+      >
+        Connexion à Spotify
+      </button>
     </div>
   );
 }
