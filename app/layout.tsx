@@ -1,8 +1,10 @@
+import Header from "@/components/Header";
+import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { ToastContainer } from "react-toastify"; // Import du ToastContainer
+import { Geist, Geist_Mono, Inter } from "next/font/google";
+
 import "react-toastify/dist/ReactToastify.css"; // Import des styles par défaut de react-toastify
+import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,6 +13,11 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -27,18 +34,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`bg-black text-white h-[100dvh] w-full m-0 p-0 ${geistSans.variable} ${geistMono.variable} ${inter.variable}  antialiased`}
       >
-        {children}
-        <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar
-          newestOnTop
-          closeOnClick
-          pauseOnHover
-          draggable
-        />
+        <Header />
+        <main>
+          {children}
+          <Toaster />
+        </main>
       </body>
     </html>
   );
