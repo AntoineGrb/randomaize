@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader } from "@/components/Loader";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -34,9 +35,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
       } catch (err: any) {
         console.error("Error fetching playlist data:", err);
       } finally {
-        setTimeout(() => {
-          setLoading(false);
-        }, 10000);
+        setLoading(false);
       }
     };
 
@@ -132,7 +131,11 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
   };
 
   if (loading) {
-    return <p className="text-white text-3xl pt-36">Loading...</p>;
+    return (
+      <div className="flex flex-col items-center justify-center w-full h-full text-center">
+        <Loader></Loader>
+      </div>
+    );
   }
 
   return (
