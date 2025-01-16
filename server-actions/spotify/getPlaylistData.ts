@@ -1,7 +1,7 @@
 "use server";
 
 import { CustomPlaylistDataResponse } from "@/types/custom";
-import { SpotifyPlaylistResponse } from "@/types/spotify";
+import { SpotifyPlaylistResponse, SpotifyTrack } from "@/types/spotify";
 import { cookies } from "next/headers";
 
 export const getPlaylistData = async (
@@ -23,7 +23,7 @@ export const getPlaylistData = async (
       throw new Error("No access token found");
     }
 
-    //Call Spotify API
+    //Get playlist infos
     const response = await fetch(
       `https://api.spotify.com/v1/playlists/${playlistId}`,
       {
@@ -46,17 +46,47 @@ export const getPlaylistData = async (
       nbTracks: data.tracks.total,
     };
 
-    //Transform data
-    const tracks = data.tracks.items.map(({ track }) => ({
-      id: track.id,
-      name: track.name,
-      uri: track.uri,
-      duration_ms: track.duration_ms,
-      artists: track.artists.map((artist) => ({
-        id: artist.id,
-        name: artist.name,
-      })),
-    }));
+    //Get playlist tracks (max 100 per request)
+    const fetchAllTracks = async (): Promise<SpotifyTrack[]> => {
+      let tracks: SpotifyTrack[] = [];
+      let nextUrl:
+        | string
+        | null = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+
+      while (nextUrl) {
+        const response = await fetch(nextUrl, {
+          headers: {
+            Authorization: `Bearer ${accessToken.value}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch playlist items");
+        }
+
+        const pageData: SpotifyPlaylistResponse["tracks"] =
+          await response.json();
+
+        tracks = [
+          ...tracks,
+          ...pageData.items.map(({ track }) => ({
+            id: track.id,
+            name: track.name,
+            uri: track.uri,
+            duration_ms: track.duration_ms,
+            artists: track.artists.map((artist) => ({
+              id: artist.id,
+              name: artist.name,
+            })),
+          })),
+        ];
+
+        nextUrl = pageData.next;
+      }
+      return tracks;
+    };
+
+    const tracks = await fetchAllTracks();
 
     return { data: { infos, tracks } };
   } catch (error) {

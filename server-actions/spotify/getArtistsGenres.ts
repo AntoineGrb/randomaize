@@ -6,16 +6,11 @@ import { cookies } from "next/headers";
 export const getArtistGenres = async (
   artistIds: string[]
 ): Promise<{ data?: SpotifyArtistGenre[]; error?: string }> => {
+  const nbArtists = artistIds.length;
   try {
     // Verify input
-    if (artistIds.length === 0) {
+    if (nbArtists === 0) {
       throw new Error("No artist IDs provided.");
-    }
-
-    if (artistIds.length > 50) {
-      throw new Error(
-        "Too many artist IDs: Spotify API supports up to 50 IDs at once."
-      );
     }
 
     // Get access token
@@ -25,34 +20,47 @@ export const getArtistGenres = async (
       throw new Error("No access token found.");
     }
 
-    // Call Spotify API
-    const response = await fetch(
-      `https://api.spotify.com/v1/artists?ids=${artistIds.join(",")}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken.value}`,
-        },
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Failed to fetch genres for artists. Status: ${response.status}. Body: ${errorText}`
-      );
+    //Divide artistIds into chunks of 50
+    const chunkSize = 50;
+    const chunks = [];
+    for (let i = 0; i < nbArtists; i += chunkSize) {
+      chunks.push(artistIds.slice(i, i + chunkSize));
     }
 
-    const data: SpotifyArtistsResponse = await response.json();
+    const artistsGenres: SpotifyArtistGenre[] = [];
 
-    // Transform data
-    const artistGenres = data.artists.map((artist) => ({
-      artistId: artist.id,
-      genres: artist.genres || [],
-    }));
+    // Call Spotify API to get genres for each chunk
+    for (const chunk of chunks) {
+      const response = await fetch(
+        `https://api.spotify.com/v1/artists?ids=${chunk.join(",")}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken.value}`,
+          },
+        }
+      );
 
-    return { data: artistGenres };
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Failed to fetch genres for artists. Status: ${response.status}. Body: ${errorText}`
+        );
+      }
+
+      const data: SpotifyArtistsResponse = await response.json();
+
+      //Transform data
+      const chunkGenres = data.artists.map((artist) => ({
+        artistId: artist.id,
+        genres: artist.genres || [],
+      }));
+
+      artistsGenres.push(...chunkGenres);
+    }
+
+    return { data: artistsGenres };
   } catch (error) {
-    console.error("Error in getArtistGenres:", error);
+    console.error("Error in getArtistsGenres:", error);
     return {
       error: error instanceof Error ? error.message : "Unknown error occurred.",
     };

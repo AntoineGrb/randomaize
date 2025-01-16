@@ -18,6 +18,7 @@ export interface SpotifyPlaylistResponse {
   description: string;
   images: { url: string; height?: number; width?: number }[];
   tracks: {
+    next: string | null;
     total: number;
     items: { track: SpotifyTrack }[];
   };

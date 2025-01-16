@@ -1,8 +1,9 @@
 // page.tsx
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistData } from "@/server-actions/spotify/getPlaylistData";
-import GenerateClient from "./GenerateClient";
 import { CustomPlaylistDataResponse, CustomTrack } from "@/types/custom";
+import { getRandomSample } from "@/utils/getRandomSample";
+import GenerateClient from "./GenerateClient";
 
 interface PageProps {
   params: Promise<{ playlistId: string }>;
@@ -14,6 +15,7 @@ async function initializePlaylistData(playlistId: string): Promise<{
   customTracks: CustomTrack[];
 }> {
   try {
+    // Get playlist data (infos and tracks)
     const playlistResponse = await getPlaylistData(playlistId);
     if (playlistResponse.error) {
       throw new Error(playlistResponse.error);
@@ -21,8 +23,19 @@ async function initializePlaylistData(playlistId: string): Promise<{
 
     const playlistInfos = playlistResponse.data?.infos;
     const playlistTracks = playlistResponse.data?.tracks || [];
-    const artistsIds = playlistTracks.map((item) => item.artists[0].id);
+    console.log("Serveur side : playlist infos: ", playlistInfos);
+    console.log("Serveur side : playistTracks: ", playlistTracks);
+    // Get unique artists IDs
+    const artistsIds = Array.from(
+      new Set(
+        playlistTracks
+          .map((item) => item.artists[0]?.id)
+          .filter((id) => id !== null && id !== undefined)
+      )
+    );
+    console.log("Serveur side : artistsIds: ", artistsIds);
 
+    // Get artists genres
     const artistsGenresResponse = await getArtistGenres(artistsIds);
     if (artistsGenresResponse.error) {
       throw new Error(artistsGenresResponse.error);
@@ -30,8 +43,8 @@ async function initializePlaylistData(playlistId: string): Promise<{
 
     const artistsGenres = artistsGenresResponse.data || [];
 
-    // Transform data to custom track format
-    const customTracks = playlistTracks.map((track) => {
+    // Transform tracks to custom track format
+    const customTracks: CustomTrack[] = playlistTracks.map((track) => {
       const artistId = track.artists[0].id;
       const artistGenres = artistsGenres.find(
         (artist) => artist.artistId === artistId
@@ -46,7 +59,14 @@ async function initializePlaylistData(playlistId: string): Promise<{
       };
     });
 
-    return { playlistInfos: playlistInfos!, customTracks };
+    const sampledTracks = getRandomSample(customTracks, 50);
+    console.log(
+      "Serveur side : sampledTracks: ",
+      sampledTracks.length,
+      sampledTracks
+    );
+
+    return { playlistInfos: playlistInfos!, customTracks: sampledTracks };
   } catch (error) {
     console.error("Error initializing playlist data:", error);
     throw error;
