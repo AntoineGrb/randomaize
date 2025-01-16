@@ -18,9 +18,7 @@ export interface CustomPlaylistDataResponse {
     id: string;
     name: string;
     image: string | null;
-    owner: {
-      display_name: string;
-    };
+    ownerName: string;
     nbTracks: number;
   };
   tracks: SpotifyTrack[];

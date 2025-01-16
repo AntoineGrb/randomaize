@@ -17,7 +17,7 @@ export async function initializePlaylistData(playlistId: string): Promise<{
 }> {
   try {
     // Récupérer les données de la playlist
-    const playlistResponse = await getPlaylistData(playlistId);
+    const playlistResponse = await getPlaylistData(playlistId, 300);
     if (playlistResponse.error) {
       throw new Error(playlistResponse.error);
     }

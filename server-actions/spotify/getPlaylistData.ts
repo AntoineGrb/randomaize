@@ -11,7 +11,8 @@ import { SpotifyPlaylistResponse, SpotifyTrack } from "@/types/spotify";
 import { cookies } from "next/headers";
 
 export const getPlaylistData = async (
-  playlistId: string
+  playlistId: string,
+  nbTracksMax: number
 ): Promise<{
   data?: CustomPlaylistDataResponse;
   error?: string;
@@ -49,17 +50,18 @@ export const getPlaylistData = async (
       id: data.id,
       name: data.name,
       image: data.images.length > 0 ? data.images[0].url : null,
+      ownerName: data.owner.display_name,
       nbTracks: data.tracks.total,
     };
 
-    //Get playlist tracks (max 100 per request)
+    //Get playlist tracks (max 100 per request, max 500 tracks)
     const fetchAllTracks = async (): Promise<SpotifyTrack[]> => {
       let tracks: SpotifyTrack[] = [];
       let nextUrl:
         | string
         | null = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
-      while (nextUrl) {
+      while (nextUrl && tracks.length < nbTracksMax) {
         const response = await fetch(nextUrl, {
           headers: {
             Authorization: `Bearer ${accessToken.value}`,
@@ -73,19 +75,22 @@ export const getPlaylistData = async (
         const pageData: SpotifyPlaylistResponse["tracks"] =
           await response.json();
 
-        tracks = [
-          ...tracks,
-          ...pageData.items.map(({ track }) => ({
-            id: track.id,
-            name: track.name,
-            uri: track.uri,
-            duration_ms: track.duration_ms,
-            artists: track.artists.map((artist) => ({
-              id: artist.id,
-              name: artist.name,
-            })),
+        const newTracks = pageData.items.map(({ track }) => ({
+          id: track.id,
+          name: track.name,
+          uri: track.uri,
+          duration_ms: track.duration_ms,
+          artists: track.artists.map((artist) => ({
+            id: artist.id,
+            name: artist.name,
           })),
-        ];
+        }));
+
+        tracks = [...tracks, ...newTracks];
+
+        if (tracks.length > nbTracksMax) {
+          tracks = tracks.slice(0, nbTracksMax);
+        }
 
         nextUrl = pageData.next;
       }
