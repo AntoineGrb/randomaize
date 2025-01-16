@@ -34,12 +34,12 @@ export const generateTracklist = async (
       )
       .join("\n");
 
-    const headPrompt = `Tu es un assistant musical qui analyse des playlists et sélectionne des morceaux selon des critères spécifiques. Ton objectif est de proposer une liste de morceaux répondant au mieux au contexte, en utilisant les données fournies sur chaque morceau. À partir du contexte, de la playlist et du nombre de morceaux transmis ci-dessous, tu devras:
+    const headPrompt = `Tu es un assistant musical qui analyse des playlists et sélectionne des morceaux selon des critères spécifiques. Ton objectif est de proposer une liste de morceaux répondant au mieux au contexte, en utilisant les données fournies sur chaque morceau. Tu va recevoir 3 inputs ci-dessous : le contexte, la playlist et le nombre de morceaux souhaités. A partir de ces inpunts, tu devras :
   1. Identifier les morceaux correspondant aux critères définis dans la demande.
-  2. Trier aléatoirement les morceaux pertinents. 
-  3. Si le nombre de morceaux pertinents est inférieur au nombre de morceaux souhaités, complètes la liste par des morceaux complémentaires choisis aléatoirement dans la playlist transmise.
-  4. Retourne les morceaux pertinents en premier, et à la suite les éventuels morceaux complémentaires.
-  Ta réponse doit contenir uniquement un tableau d'uris. Tout texte supplémentaire est interdit. Exemple : ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"].`;
+  2. Trier aléatoirement les morceaux correspondants. 
+  3. Si le nombre de morceaux correspondants est inférieur au nombre de morceaux souhaités, compléter la liste par d'autres morceaux choisis aléatoirement dans la playlist transmise. Les morceaux pertinents sont retournés en premier dans la liste, et les morceaux complémentaires sont ajoutés à la fin.
+  4. Retourner la liste des morceaux. Ta réponse doit contenir uniquement un tableau d'uris. Tout texte supplémentaire est interdit. La longueur du tableau doit être égale au nombre de morceaux souhaités. 
+  Exemple de réponse : ["spotify:track:4iV5W9uYEdYUVa79Axb7Rh", "spotify:track:1301WleyT98MSxVHPZCA6M"].`;
 
     const contextPrompt = `Contexte: ${userPrompt}. Nombre de morceaux souhaités: ${limit}. Playlist: ${formattedPlaylist}.`;
 
