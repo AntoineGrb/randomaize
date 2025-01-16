@@ -8,7 +8,8 @@ export default function LoginPage() {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full text-center">
       <p className="text-center pb-4">
-        Utilise l'IA pour générer une liste de lecture personnalisée !
+        Utilise l'IA pour générer une liste de lecture qui correspond à ton mood
+        actuel !
       </p>
       <button
         onClick={handleLogin}

@@ -1,5 +1,6 @@
 /**
- * This function initializes the playlist data for the user. It uses several server actions to get the playlist data, the artists genres and transform the tracks to a custom format.
+ * This function initializes the playlist data for the user.
+ * It uses several server actions to get the playlist data, the artists genres and transform the tracks to a custom format.
  * @param playlistId The playlist ID
  * @returns The playlist infos and custom tracks
  */
@@ -9,7 +10,6 @@
 import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
 import { getPlaylistData } from "@/server-actions/spotify/getPlaylistData";
 import { CustomPlaylistDataResponse, CustomTrack } from "@/types/custom";
-import { getRandomSample } from "@/utils/getRandomSample";
 
 export async function initializePlaylistData(playlistId: string): Promise<{
   playlistInfos: CustomPlaylistDataResponse["infos"];

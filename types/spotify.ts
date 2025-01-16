@@ -1,4 +1,7 @@
-//Playlists
+/*
+  Types returned by Spotify API.  
+*/
+
 export interface SpotifyPlaylist {
   id: string;
   name: string;

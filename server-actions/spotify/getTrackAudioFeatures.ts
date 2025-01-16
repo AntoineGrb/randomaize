@@ -15,7 +15,7 @@ export const getTrackAudioFeatures = async (
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("spotify_access_token");
   if (!accessToken) {
-    throw new Error("No access token found");
+    throw new Error("Pas de token d'accès found");
   }
 
   console.log("Access Token:", accessToken.value);

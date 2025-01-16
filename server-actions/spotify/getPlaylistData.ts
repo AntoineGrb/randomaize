@@ -1,3 +1,9 @@
+/**
+ * The function gets the data for a Spotify playlist (infos and tracks). For tracks, it fetches all the tracks in the playlist (max 100 per request).
+ * @param playlistId The ID of the playlist
+ * @returns The playlist infos and tracks or an error message
+ */
+
 "use server";
 
 import { CustomPlaylistDataResponse } from "@/types/custom";
@@ -20,7 +26,7 @@ export const getPlaylistData = async (
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("spotify_access_token");
     if (!accessToken) {
-      throw new Error("No access token found");
+      throw new Error("Pas de token d'accès found");
     }
 
     //Get playlist infos
@@ -91,6 +97,8 @@ export const getPlaylistData = async (
     return { data: { infos, tracks } };
   } catch (error) {
     console.error(error);
-    return { error: error instanceof Error ? error.message : "Unknown error" };
+    return {
+      error: error instanceof Error ? error.message : "Erreur inconnue",
+    };
   }
 };

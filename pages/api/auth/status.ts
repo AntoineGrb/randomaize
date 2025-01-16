@@ -7,7 +7,7 @@ export default async function handler(
   const accessToken = req.cookies.spotify_access_token;
 
   if (!accessToken) {
-    console.error("No access token");
+    console.error("Pas de token d'accès");
     return res.status(401).json({ isLoggedIn: false });
   }
 

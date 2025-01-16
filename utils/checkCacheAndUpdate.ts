@@ -1,6 +1,14 @@
+/**
+ * This function checks the cache for the playlist data and updates it if necessary.
+ * Cache allows to avoid fetching the same data multiple times.
+ * @param playlistId The playlist ID
+ * @param initializeData The function to initialize the playlist data
+ * @returns The playlist cache (new or cached)
+ */
+
 import { getPlaylistSnapshotId } from "@/server-actions/spotify/getPlaylistSnapshotId";
 import { initializePlaylistData } from "@/server-actions/spotify/initializePlaylistData";
-import { CustomTrack, PlaylistCache } from "@/types/custom";
+import { PlaylistCache } from "@/types/custom";
 
 export async function checkCacheAndUpdate(
   playlistId: string,

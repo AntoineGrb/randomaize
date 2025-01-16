@@ -1,8 +1,4 @@
 // page.tsx
-import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
-import { getPlaylistData } from "@/server-actions/spotify/getPlaylistData";
-import { CustomPlaylistDataResponse, CustomTrack } from "@/types/custom";
-import { getRandomSample } from "@/utils/getRandomSample";
 import GenerateClient from "./GenerateClient";
 
 interface PageProps {

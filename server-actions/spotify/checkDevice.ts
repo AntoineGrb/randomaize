@@ -1,3 +1,8 @@
+/**
+ * Check if a device is active and available to play music.
+ * @returns A success message or an error message
+ */
+
 "use server";
 
 import { cookies } from "next/headers";
@@ -10,7 +15,7 @@ export const checkDevice = async (): Promise<{
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("spotify_access_token");
     if (!accessToken) {
-      throw new Error("No access token found.");
+      throw new Error("Pas de token d'accès.");
     }
 
     // Récupère la liste des devices
@@ -25,23 +30,21 @@ export const checkDevice = async (): Promise<{
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch devices.");
+      throw new Error("Erreur lors de la récupération des appareils.");
     }
 
     const data = await response.json();
     const devices = data.devices;
-    console.log("Devices:", devices);
 
-    // Vérifie si un device actif est disponible
+    // Verify if an active device is available
     const activeDevice = devices.find((device: any) => device.is_active);
     if (activeDevice) {
-      return { success: true }; // Device actif trouvé
+      return { success: true };
     }
 
-    // Si aucun device actif, mais un device disponible
+    // If no active device is found, check for an available device to activate
     const availableDevice = devices.find((device: any) => device.is_available);
     if (availableDevice) {
-      // Tente de transférer la lecture sur ce device
       const transferResponse = await fetch(
         "https://api.spotify.com/v1/me/player",
         {
@@ -55,17 +58,17 @@ export const checkDevice = async (): Promise<{
       );
 
       if (transferResponse.ok) {
-        return { success: true }; // Device activé avec succès
+        return { success: true };
       } else {
-        throw new Error("Failed to activate the selected device.");
+        throw new Error("Erreur pour activer l'appareil disponible.");
       }
     }
 
     throw new Error(
-      "No active devices found. Please open Spotify on a device and try again."
+      "Pas d'appareil actif trouvé. Veuillez ouvrir Spotify sur un appareil pour continuer."
     );
   } catch (error) {
     console.error("Error in checkDevice:", error);
-    return { error: error instanceof Error ? error.message : "Unknown error" };
+    return { error: error instanceof Error ? error.message : "Erreur inconue" };
   }
 };

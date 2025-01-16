@@ -15,13 +15,13 @@ export const generateTracklist = async (
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("spotify_access_token");
     if (!accessToken) {
-      throw new Error("No access token found");
+      throw new Error("Pas de token d'accès.");
     }
 
     // Get the OpenAI API key
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {
-      throw new Error("OpenAI API key is missing.");
+      throw new Error("Pas de clé OpenAI trouvée.");
     }
 
     // Prepare prompt
@@ -62,30 +62,26 @@ export const generateTracklist = async (
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch playlist items");
+      throw new Error("Erreur pour récupérer les données de l'API OpenAI");
     }
 
     const openAIResponse: OpenAIResponse = await response.json();
-    console.log(
-      "!!!! OpenAiReponse:",
-      openAIResponse.choices[0]?.message.content
-    );
 
     const content = openAIResponse.choices[0]?.message.content;
     if (!content) {
-      throw new Error("No content found in OpenAI response");
+      throw new Error("Pas de réponse fournie par OpenAI");
     }
 
     // Validate the JSON output
     if (!validateAiResponse(content)) {
-      throw new Error("Invalid JSON output from OpenAI");
+      throw new Error("Réponse invalide de l'API OpenAI");
     }
 
     return { data: JSON.parse(content) };
   } catch (error) {
     console.error("Error in generateTracklist:", error);
     return {
-      error: error instanceof Error ? error.message : "Unknown error occurred.",
+      error: error instanceof Error ? error.message : "Erreur inconnue.",
     };
   }
 };

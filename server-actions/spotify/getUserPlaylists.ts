@@ -1,3 +1,8 @@
+/**
+ * The function gets current user's playlists.
+ * @returns The user's playlists or an error message
+ */
+
 "use server";
 
 import { SpotifyPlaylist } from "@/types/spotify";
@@ -7,7 +12,7 @@ export const getUserPlaylists = async () => {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("spotify_access_token");
   if (!accessToken) {
-    throw new Error("No access token found");
+    throw new Error("Pas de token d'accès found");
   }
 
   const response = await fetch("https://api.spotify.com/v1/me/playlists", {

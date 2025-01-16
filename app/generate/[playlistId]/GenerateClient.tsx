@@ -22,10 +22,10 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Verify cache and update if necessary on first render
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Vérification et mise à jour du cache
         const data = await checkCacheAndUpdate(
           playlistId,
           initializePlaylistData
@@ -34,13 +34,16 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
       } catch (err: any) {
         console.error("Error fetching playlist data:", err);
       } finally {
-        setLoading(false);
+        setTimeout(() => {
+          setLoading(false);
+        }, 10000);
       }
     };
 
     fetchData();
   }, [playlistId]);
 
+  // Handle form submission when asking AI to generate a tracklist
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -48,8 +51,8 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
     if (!prompt.trim()) {
       toast({
         title: "Error",
-        description: "Please enter a prompt",
-        variant: "destructive", // Utilise une variante pour les erreurs
+        description: "Il faut écrire un prompt!",
+        variant: "destructive",
       });
       return;
     }
@@ -57,7 +60,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
     setIsGenerating(true);
 
     try {
-      // Check if a device is active
+      // Check if a device is active before requests
       const deviceCheck = await checkDevice();
       if (deviceCheck.error) {
         toast({
@@ -93,7 +96,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
       if (!uris || uris.length === 0) {
         toast({
           title: "Error",
-          description: "No tracks generated",
+          description: "Pas de morceaux générés",
           variant: "destructive",
         });
         return;
@@ -109,9 +112,9 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
       } else {
         toast({
           title: "Success",
-          description: "Tracks added and played on your Spotify device!",
+          description: "Liste de lecture ajoutée et lancée sur Spotify!",
           duration: 2000,
-          variant: "default", // Variante par défaut pour les succès
+          variant: "default",
         });
         setPrompt("");
       }
@@ -119,7 +122,8 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
       console.error("Error generating tracklist:", error);
       toast({
         title: "Error",
-        description: "Error generating tracklist: no active device found",
+        description:
+          "Erreur pendant la génération de la liste de lecture: pas d'appareil trouvé!",
         variant: "destructive",
       });
     } finally {
@@ -128,7 +132,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <p className="text-white text-3xl pt-36">Loading...</p>;
   }
 
   return (
@@ -169,7 +173,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
         </div>
         <div className="flex justify-center">
           <Button type="submit" disabled={isGenerating}>
-            {isGenerating ? "Generating..." : "Generate"}
+            {isGenerating ? "En cours..." : "Génerer"}
             {isGenerating && <Loader2 className="animate-spin" />}
           </Button>
         </div>

@@ -1,3 +1,7 @@
+/*
+  Custom types for transformed data. 
+*/
+
 import { SpotifyTrack } from "./spotify";
 
 export interface CustomPlaylist {

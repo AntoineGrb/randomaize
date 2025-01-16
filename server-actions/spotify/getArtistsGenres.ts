@@ -1,3 +1,10 @@
+/**
+ * Get genres for a list of artists.
+ * The Spotify API allows to get genres for up to 50 artists at once. The function divides the list of artists into chunks of 50 and calls the API for each chunk.
+ * @param artistIds The list of artist IDs
+ * @returns The genres for each artist or an error message
+ */
+
 "use server";
 
 import { SpotifyArtistGenre, SpotifyArtistsResponse } from "@/types/spotify";
@@ -17,7 +24,7 @@ export const getArtistGenres = async (
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("spotify_access_token");
     if (!accessToken) {
-      throw new Error("No access token found.");
+      throw new Error("Pas de token d'accès.");
     }
 
     //Divide artistIds into chunks of 50
@@ -62,7 +69,8 @@ export const getArtistGenres = async (
   } catch (error) {
     console.error("Error in getArtistsGenres:", error);
     return {
-      error: error instanceof Error ? error.message : "Unknown error occurred.",
+      error:
+        error instanceof Error ? error.message : "Erreur inconnue occurred.",
     };
   }
 };
