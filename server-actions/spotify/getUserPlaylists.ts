@@ -30,6 +30,7 @@ export const getUserPlaylists = async () => {
     id: playlist.id,
     name: playlist.name,
     description: playlist.description,
+    ownerName: playlist.owner.display_name,
     image:
       playlist.images && playlist.images.length > 0
         ? playlist.images[0].url

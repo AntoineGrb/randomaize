@@ -9,6 +9,7 @@ export interface CustomPlaylist {
   name: string;
   description: string | null;
   image: string | null;
+  ownerName: string;
   trackCount: number;
 }
 
@@ -17,6 +18,9 @@ export interface CustomPlaylistDataResponse {
     id: string;
     name: string;
     image: string | null;
+    owner: {
+      display_name: string;
+    };
     nbTracks: number;
   };
   tracks: SpotifyTrack[];

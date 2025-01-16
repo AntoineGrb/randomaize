@@ -10,6 +10,10 @@ h1 {
   @apply text-2xl;
 }
 
+h2 {
+  @apply text-lg;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

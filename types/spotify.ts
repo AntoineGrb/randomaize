@@ -6,6 +6,7 @@ export interface SpotifyPlaylist {
   id: string;
   name: string;
   description: string;
+  owner: { display_name: string };
   images: { url: string }[];
   tracks: { total: number };
 }
@@ -19,6 +20,7 @@ export interface SpotifyPlaylistResponse {
   id: string;
   name: string;
   description: string;
+  owner: { display_name: string };
   images: { url: string; height?: number; width?: number }[];
   tracks: {
     next: string | null;
