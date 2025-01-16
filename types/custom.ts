@@ -27,7 +27,8 @@ export interface CustomTrack {
   genres: string[];
 }
 
-export interface CustomTrackReturnedByAI {
-  uri: string;
-  name: string; //TODO : à  retirer
+export interface PlaylistCache {
+  snapshotId: string;
+  infos: CustomPlaylistDataResponse["infos"];
+  tracks: CustomTrack[];
 }
