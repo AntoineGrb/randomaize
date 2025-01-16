@@ -57,10 +57,7 @@ export async function initializePlaylistData(playlistId: string): Promise<{
       };
     });
 
-    // Échantillonner les morceaux
-    const sampledTracks = getRandomSample(customTracks, 50);
-
-    return { playlistInfos: playlistInfos!, customTracks: sampledTracks };
+    return { playlistInfos: playlistInfos!, customTracks };
   } catch (error) {
     console.error("Error in initializePlaylistData:", error);
     throw error;

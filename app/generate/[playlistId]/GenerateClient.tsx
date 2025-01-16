@@ -10,6 +10,7 @@ import { checkDevice } from "@/server-actions/spotify/checkDevice";
 import { initializePlaylistData } from "@/server-actions/spotify/initializePlaylistData";
 import { PlaylistCache } from "@/types/custom";
 import { checkCacheAndUpdate } from "@/utils/checkCacheAndUpdate";
+import { getRandomSample } from "@/utils/getRandomSample";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -68,10 +69,13 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
         return;
       }
 
+      const sampledTracks = getRandomSample(playlistData!.tracks, 50); // Sample 50 random tracks
+      console.log("Client side - Sampled tracks:", sampledTracks);
+
       // Generate tracks
       const generatedTracks = await generateTracklist(
         prompt,
-        playlistData!.tracks,
+        sampledTracks,
         limit
       );
       if (generatedTracks.error) {
