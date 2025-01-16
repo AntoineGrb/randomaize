@@ -7,21 +7,39 @@ import { useToast } from "@/hooks/use-toast";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksAndPlay } from "@/server-actions/spotify/addTracksAndPlay";
 import { checkDevice } from "@/server-actions/spotify/checkDevice";
-import { CustomPlaylistDataResponse, CustomTrack } from "@/types/custom";
+import { initializePlaylistData } from "@/server-actions/spotify/initializePlaylistData";
+import { PlaylistCache } from "@/types/custom";
+import { checkCacheAndUpdate } from "@/utils/checkCacheAndUpdate";
+import { getRandomSample } from "@/utils/getRandomSample";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function GenerateClient({
-  initialPlaylistInfos,
-  initialCustomTracks,
-}: {
-  initialPlaylistInfos: CustomPlaylistDataResponse["infos"];
-  initialCustomTracks: CustomTrack[];
-}) {
+export default function GenerateClient({ playlistId }: { playlistId: string }) {
+  const [playlistData, setPlaylistData] = useState<PlaylistCache | null>(null);
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [limit, setLimit] = useState(10);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Vérification et mise à jour du cache
+        const data = await checkCacheAndUpdate(
+          playlistId,
+          initializePlaylistData
+        );
+        setPlaylistData(data);
+      } catch (err: any) {
+        console.error("Error fetching playlist data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [playlistId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,10 +69,13 @@ export default function GenerateClient({
         return;
       }
 
+      const sampledTracks = getRandomSample(playlistData!.tracks, 50); // Sample 50 random tracks
+      console.log("Client side - Sampled tracks:", sampledTracks);
+
       // Generate tracks
       const generatedTracks = await generateTracklist(
         prompt,
-        initialCustomTracks,
+        sampledTracks,
         limit
       );
       if (generatedTracks.error) {
@@ -106,17 +127,21 @@ export default function GenerateClient({
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="px-4 py-24">
       <div className="flex gap-2 justify-start items-center mb-24">
-        {initialPlaylistInfos.image && (
+        {playlistData?.infos?.image && (
           <img
-            src={initialPlaylistInfos.image}
-            alt={initialPlaylistInfos.name}
+            src={playlistData?.infos.image}
+            alt={playlistData?.infos.name}
             className="w-10 h-10 rounded"
           />
         )}
-        <p>{initialPlaylistInfos.name} </p>
+        <p>{playlistData?.infos?.name} </p>
       </div>
       <h1 className="mb-4 text-center">Que veux-tu écouter ? </h1>
       <form onSubmit={handleSubmit}>
