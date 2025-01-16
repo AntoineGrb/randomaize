@@ -4,7 +4,6 @@ import Link from "next/link";
 
 export default async function PlaylistsPage() {
   const playlists = await getUserPlaylists();
-  console.log("user playlists: ", playlists);
 
   return (
     <div className="px-4 py-24">

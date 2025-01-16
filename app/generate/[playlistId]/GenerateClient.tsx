@@ -168,10 +168,10 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
             defaultValue="10"
             onValueChange={(value) => setLimit(parseInt(value))}
           >
-            <ToggleGroupItem value="2">2</ToggleGroupItem>
+            <ToggleGroupItem value="5">5</ToggleGroupItem>
             <ToggleGroupItem value="10">10</ToggleGroupItem>
             <ToggleGroupItem value="20">20</ToggleGroupItem>
-            <ToggleGroupItem value="50">50</ToggleGroupItem>
+            <ToggleGroupItem value="30">30</ToggleGroupItem>
           </ToggleGroup>
         </div>
         <div className="flex justify-center">

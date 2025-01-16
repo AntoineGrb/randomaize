@@ -23,17 +23,14 @@ export async function initializePlaylistData(playlistId: string): Promise<{
     }
 
     const playlistInfos = playlistResponse.data?.infos;
-    const playlistTracks = playlistResponse.data?.tracks || [];
-
-    // Récupérer les genres des artistes
-    const artistsIds = Array.from(
-      new Set(
-        playlistTracks
-          .map((item) => item.artists[0]?.id)
-          .filter((id) => id !== null && id !== undefined)
-      )
+    const playlistTracks = (playlistResponse.data?.tracks || []).filter(
+      (track) => track.id !== null && track.id !== undefined
     );
 
+    // Get artists genres
+    const artistsIds = Array.from(
+      new Set(playlistTracks.map((item) => item.artists[0]?.id))
+    );
     const artistsGenresResponse = await getArtistGenres(artistsIds);
     if (artistsGenresResponse.error) {
       throw new Error(artistsGenresResponse.error);
@@ -41,7 +38,7 @@ export async function initializePlaylistData(playlistId: string): Promise<{
 
     const artistsGenres = artistsGenresResponse.data || [];
 
-    // Transformer les données des morceaux
+    // Transform tracks to custom format
     const customTracks: CustomTrack[] = playlistTracks.map((track) => {
       const artistId = track.artists[0].id;
       const artistGenres = artistsGenres.find(
