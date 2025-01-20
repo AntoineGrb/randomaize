@@ -68,7 +68,6 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
           description: deviceCheck.error,
           variant: "destructive",
         });
-        setIsGenerating(false);
         return;
       }
 
@@ -146,7 +145,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
   return (
     <div className="px-4 py-24">
       <div className="flex gap-2 justify-start items-center mb-24">
-        <ChevronLeft onClick={handlePreviousPage} />
+        <ChevronLeft onClick={handlePreviousPage} className="cursor-pointer" />
         {playlistData?.infos?.image && (
           <img
             src={playlistData?.infos.image}
@@ -156,16 +155,24 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
         )}
         <p>{playlistData?.infos?.name} </p>
       </div>
-      <h1 className="mb-4 text-center">Que veux-tu écouter ? </h1>
+      <div className="flex gap-1 justify-center items-center mb-4">
+        <img
+          src="/assets/icon-robot.png"
+          alt="icon"
+          className="w-[40px] top-[-3px] relative"
+        />
+        <h1 className="text-center">Que veux-tu écouter ? </h1>
+      </div>
+
       <form onSubmit={handleSubmit}>
         <Textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Je veux des sons calmes, de la techno minimale..."
-          className="mb-6"
+          placeholder="Des sons calmes, des chansons françaises, de la techno minimale..."
+          className="mb-6 border border-spotify-gray-light bg-spotify-black text-spotify-white placeholder:text-spotify-gray-light"
         />
-        <div className="flex gap-2 justify-start items-center mb-4">
-          <p> Morceaux souhaités : </p>
+        <div className="flex gap-2 justify-start items-center mb-6">
+          <p> Nombre de morceaux : </p>
           <ToggleGroup
             type="single"
             variant="outline"
@@ -181,7 +188,11 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
           </ToggleGroup>
         </div>
         <div className="flex justify-center">
-          <Button type="submit" disabled={isGenerating}>
+          <Button
+            type="submit"
+            disabled={isGenerating}
+            className="w-full py-4 bg-spotify-green text-white disabled:bg-spotify-gray-dark disabled:text-white hover:bg-green-600"
+          >
             {isGenerating ? "En cours..." : "Génerer"}
             {isGenerating && <Loader2 className="animate-spin" />}
           </Button>

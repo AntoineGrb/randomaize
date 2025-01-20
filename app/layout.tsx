@@ -35,11 +35,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-black text-white h-[100dvh] w-full m-0 p-0 ${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
+        className={`bg-spotify-black text-white h-[100dvh] w-full m-0 p-0 ${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
       >
         <AuthProvider>
           <Header />
-          <main className="w-full h-[100dvh] *">
+          <main className="w-full h-[100dvh] max-w-[500px] mx-auto">
             {children}
             <Toaster />
           </main>
