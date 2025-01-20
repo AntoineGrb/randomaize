@@ -55,16 +55,12 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
 
     setError(null);
     setIsGenerating(true);
-    const firstTrackId = playlistData?.tracks[0].id; // Get the first track ID for the open link
-    const spotifyTrackLink = `https://open.spotify.com/track/${firstTrackId}`;
 
     try {
       // Check if a device is active before requests
       const deviceCheck = await checkDevice();
       if (deviceCheck.error) {
-        window.open(spotifyTrackLink, "_blank"); // Open Spotify link to activate device on mobile
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        // setError(deviceCheck.error);
+        setError(deviceCheck.error);
         return;
       }
 
