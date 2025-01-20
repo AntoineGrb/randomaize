@@ -21,6 +21,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Verify cache and update if necessary on first render
@@ -48,14 +49,11 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
 
     // Validate prompt
     if (!prompt.trim()) {
-      toast({
-        title: "Error",
-        description: "Il faut écrire un prompt!",
-        variant: "destructive",
-      });
+      setError("Il faut écrire un prompt !");
       return;
     }
 
+    setError(null);
     setIsGenerating(true);
 
     try {
@@ -63,11 +61,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
       //! Lien à tester : https://open.spotify.com/track/2bmgv7q8RgC0NgF9SlGlpe
       const deviceCheck = await checkDevice();
       if (deviceCheck.error) {
-        toast({
-          title: "Error",
-          description: deviceCheck.error,
-          variant: "destructive",
-        });
+        setError(deviceCheck.error);
         return;
       }
 
@@ -81,11 +75,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
         limit
       );
       if (generatedTracks.error) {
-        toast({
-          title: "Error",
-          description: generatedTracks.error,
-          variant: "destructive",
-        });
+        setError(generatedTracks.error);
         return;
       }
 
@@ -93,38 +83,25 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
       const uris = generatedTracks.data;
 
       if (!uris || uris.length === 0) {
-        toast({
-          title: "Error",
-          description: "Pas de morceaux générés",
-          variant: "destructive",
-        });
+        setError("Pas de morceaux générés.");
         return;
       }
 
       const play = await addTracksAndPlay(uris);
       if (play.error) {
-        toast({
-          title: "Error",
-          description: play.error,
-          variant: "destructive",
-        });
+        setError(play.error);
       } else {
         toast({
           title: "Success",
           description: "Liste de lecture ajoutée et lancée sur Spotify!",
-          duration: 2000,
+          duration: 1500,
           variant: "default",
         });
         setPrompt("");
       }
     } catch (error: any) {
       console.error("Error generating tracklist:", error);
-      toast({
-        title: "Error",
-        description:
-          "Erreur pendant la génération de la liste de lecture: pas d'appareil trouvé!",
-        variant: "destructive",
-      });
+      setError("Erreur pendant la génération de la liste de lecture.");
     } finally {
       setIsGenerating(false);
     }
@@ -168,7 +145,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
         <Textarea
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Des sons calmes, des chansons françaises, de la techno minimale..."
+          placeholder="Des sons calmes, de la techno minimale..."
           className="mb-6 border border-spotify-gray-light bg-spotify-black text-spotify-white placeholder:text-spotify-gray-light"
         />
         <div className="flex gap-2 justify-start items-center mb-6">
@@ -187,7 +164,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
             <ToggleGroupItem value="30">30</ToggleGroupItem>
           </ToggleGroup>
         </div>
-        <div className="flex justify-center">
+        <div className="flex flex-col justify-center gap-4">
           <Button
             type="submit"
             disabled={isGenerating}
@@ -196,6 +173,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
             {isGenerating ? "En cours..." : "Génerer"}
             {isGenerating && <Loader2 className="animate-spin" />}
           </Button>
+          <p className="text-red-500 text-xs text-center">{error}</p>
         </div>
       </form>
     </div>
