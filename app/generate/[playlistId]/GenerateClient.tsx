@@ -60,6 +60,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
 
     try {
       // Check if a device is active before requests
+      //! Lien à tester : https://open.spotify.com/track/2bmgv7q8RgC0NgF9SlGlpe
       const deviceCheck = await checkDevice();
       if (deviceCheck.error) {
         toast({

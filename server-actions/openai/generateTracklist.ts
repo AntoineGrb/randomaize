@@ -61,6 +61,8 @@ export const generateTracklist = async (
       }),
     });
 
+    console.log("OpenAI Response:", response);
+
     if (!response.ok) {
       throw new Error("Erreur pour récupérer les données de l'API OpenAI");
     }
