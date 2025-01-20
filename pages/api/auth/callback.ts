@@ -28,11 +28,13 @@ export default async function handler(
       }
     );
 
-    const { access_token, refresh_token, expires_in } = response.data;
+    const { access_token, refresh_token } = response.data;
 
     // Stock tokens in cookies/session (or state management if needed)
     res.setHeader("Set-Cookie", [
-      `spotify_access_token=${access_token}; Path=/; HttpOnly; Max-Age=${expires_in}`,
+      `spotify_access_token=${access_token}; Path=/; HttpOnly; Max-Age=${
+        30 * 24 * 60 * 60
+      }`,
       `spotify_refresh_token=${refresh_token}; Path=/; HttpOnly;`,
     ]);
 
