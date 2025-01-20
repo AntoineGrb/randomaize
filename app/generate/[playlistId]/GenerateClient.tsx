@@ -12,7 +12,7 @@ import { initializePlaylistData } from "@/server-actions/spotify/initializePlayl
 import { PlaylistCache } from "@/types/custom";
 import { checkCacheAndUpdate } from "@/utils/checkCacheAndUpdate";
 import { getRandomSample } from "@/utils/getRandomSample";
-import { Loader2 } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export default function GenerateClient({ playlistId }: { playlistId: string }) {
@@ -131,6 +131,10 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
     }
   };
 
+  const handlePreviousPage = () => {
+    window.history.back();
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center w-full h-full text-center">
@@ -142,6 +146,7 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
   return (
     <div className="px-4 py-24">
       <div className="flex gap-2 justify-start items-center mb-24">
+        <ChevronLeft onClick={handlePreviousPage} />
         {playlistData?.infos?.image && (
           <img
             src={playlistData?.infos.image}

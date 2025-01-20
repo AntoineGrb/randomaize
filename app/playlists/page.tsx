@@ -32,7 +32,7 @@ export default async function PlaylistsPage() {
           ))}
       </ul>
 
-      <h2 className="mb-4 mt-6"> Les playlists que tu suis </h2>
+      <h2 className="mb-4 mt-6"> Playlists suivies </h2>
       {playlists
         .filter(
           (playlist: CustomPlaylist) => playlist.ownerName !== "Antoine Grb"
