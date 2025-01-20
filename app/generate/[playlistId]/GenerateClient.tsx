@@ -7,6 +7,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useToast } from "@/hooks/use-toast";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksAndPlay } from "@/server-actions/spotify/addTracksAndPlay";
+import { checkDevice } from "@/server-actions/spotify/checkDevice";
 import { initializePlaylistData } from "@/server-actions/spotify/initializePlaylistData";
 import { PlaylistCache } from "@/types/custom";
 import { checkCacheAndUpdate } from "@/utils/checkCacheAndUpdate";
@@ -54,15 +55,18 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
 
     setError(null);
     setIsGenerating(true);
+    const firstTrackId = playlistData?.tracks[0].id; // Get the first track ID for the open link
+    const spotifyTrackLink = `https://open.spotify.com/track/${firstTrackId}`;
 
     try {
       // Check if a device is active before requests
-      //! Lien à tester : https://open.spotify.com/track/2bmgv7q8RgC0NgF9SlGlpe
-      // const deviceCheck = await checkDevice();
-      // if (deviceCheck.error) {
-      //   setError(deviceCheck.error);
-      //   return;
-      // }
+      const deviceCheck = await checkDevice();
+      if (deviceCheck.error) {
+        window.open(spotifyTrackLink, "_blank"); // Open Spotify link to activate device on mobile
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // setError(deviceCheck.error);
+        return;
+      }
 
       const sampledTracks = getRandomSample(playlistData!.tracks, 50); // Sample 50 random tracks
 
@@ -83,11 +87,6 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
         setError("Pas de morceaux générés.");
         return;
       }
-
-      const spotifyTrackLink =
-        "https://open.spotify.com/track/2bmgv7q8RgC0NgF9SlGlpe";
-      window.open(spotifyTrackLink, "_blank"); // Ouvre dans un nouvel onglet
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Attend 2 secondes pour s'assurer que Spotify s'ouvre
 
       const play = await addTracksAndPlay(uris);
       if (play.error) {
