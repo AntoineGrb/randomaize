@@ -7,7 +7,6 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useToast } from "@/hooks/use-toast";
 import { generateTracklist } from "@/server-actions/openai/generateTracklist";
 import { addTracksAndPlay } from "@/server-actions/spotify/addTracksAndPlay";
-import { checkDevice } from "@/server-actions/spotify/checkDevice";
 import { initializePlaylistData } from "@/server-actions/spotify/initializePlaylistData";
 import { PlaylistCache } from "@/types/custom";
 import { checkCacheAndUpdate } from "@/utils/checkCacheAndUpdate";
@@ -59,14 +58,13 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
     try {
       // Check if a device is active before requests
       //! Lien à tester : https://open.spotify.com/track/2bmgv7q8RgC0NgF9SlGlpe
-      const deviceCheck = await checkDevice();
-      if (deviceCheck.error) {
-        setError(deviceCheck.error);
-        return;
-      }
+      // const deviceCheck = await checkDevice();
+      // if (deviceCheck.error) {
+      //   setError(deviceCheck.error);
+      //   return;
+      // }
 
       const sampledTracks = getRandomSample(playlistData!.tracks, 50); // Sample 50 random tracks
-      console.log("Client side - Sampled tracks:", sampledTracks);
 
       // Generate tracks
       const generatedTracks = await generateTracklist(
@@ -79,13 +77,17 @@ export default function GenerateClient({ playlistId }: { playlistId: string }) {
         return;
       }
 
-      console.log("Client side - Generated tracks:", generatedTracks);
       const uris = generatedTracks.data;
 
       if (!uris || uris.length === 0) {
         setError("Pas de morceaux générés.");
         return;
       }
+
+      const spotifyTrackLink =
+        "https://open.spotify.com/track/2bmgv7q8RgC0NgF9SlGlpe";
+      window.open(spotifyTrackLink, "_blank"); // Ouvre dans un nouvel onglet
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Attend 2 secondes pour s'assurer que Spotify s'ouvre
 
       const play = await addTracksAndPlay(uris);
       if (play.error) {

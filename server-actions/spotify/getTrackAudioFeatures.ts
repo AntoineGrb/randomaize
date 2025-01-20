@@ -18,9 +18,6 @@ export const getTrackAudioFeatures = async (
     throw new Error("Pas de token d'accès found");
   }
 
-  console.log("Access Token:", accessToken.value);
-  console.log("Track IDs:", trackIds);
-
   const response = await fetch(
     `https://api.spotify.com/v1/audio-features?ids=${trackIds}`,
     {
@@ -30,14 +27,11 @@ export const getTrackAudioFeatures = async (
     }
   );
 
-  console.log("Response Status:", response.status);
-
   if (!response.ok) {
     throw new Error("Failed to fetch audio features");
   }
 
   const data: SpotifyAudioFeaturesResponse = await response.json();
-  console.log("Response Data:", data);
 
   return data.audio_features.map((feature) => ({
     id: feature.id,

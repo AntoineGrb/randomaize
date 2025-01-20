@@ -35,9 +35,7 @@ export const addTracksAndPlay = async (
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(
-          `Réponse invalide de la part de l'API Spotify. Statut: ${response.status}. R&ponse: ${errorText}`
-        );
+        throw new Error(`Réponse invalide de la part de l'API Spotify.`);
       }
     } catch (error: any) {
       console.error(`Error adding tracks:`, error);

@@ -43,8 +43,6 @@ export const generateTracklist = async (
 
     const contextPrompt = `Contexte: ${userPrompt}. Nombre de morceaux souhaités: ${limit}. Playlist: ${formattedPlaylist}.`;
 
-    console.log("Context Prompt:", contextPrompt);
-
     // Call OpenAI API
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -60,8 +58,6 @@ export const generateTracklist = async (
         ],
       }),
     });
-
-    console.log("OpenAI Response:", response);
 
     if (!response.ok) {
       throw new Error("Erreur pour récupérer les données de l'API OpenAI");

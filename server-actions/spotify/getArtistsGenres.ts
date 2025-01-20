@@ -47,8 +47,6 @@ export const getArtistGenres = async (
         }
       );
 
-      console.log("Response genre call :", response);
-
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
