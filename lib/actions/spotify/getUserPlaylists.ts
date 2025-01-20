@@ -5,7 +5,7 @@
 
 "use server";
 
-import { SpotifyPlaylist } from "@/types/spotify";
+import { SpotifyPlaylist } from "@/lib/types/spotify";
 import { cookies } from "next/headers";
 
 export const getUserPlaylists = async () => {

@@ -6,9 +6,9 @@
  * @returns The playlist cache (new or cached)
  */
 
-import { getPlaylistSnapshotId } from "@/server-actions/spotify/getPlaylistSnapshotId";
-import { initializePlaylistData } from "@/server-actions/spotify/initializePlaylistData";
-import { PlaylistCache } from "@/types/custom";
+import { getPlaylistSnapshotId } from "@/lib/actions/spotify/getPlaylistSnapshotId";
+import { initializePlaylistData } from "@/lib/actions/spotify/initializePlaylistData";
+import { PlaylistCache } from "@/lib/types/custom";
 
 export async function checkCacheAndUpdate(
   playlistId: string,

@@ -1,17 +1,17 @@
 "use client";
 
-import { Loader } from "@/components/Loader";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useToast } from "@/hooks/use-toast";
-import { generateTracklist } from "@/server-actions/openai/generateTracklist";
-import { addTracksAndPlay } from "@/server-actions/spotify/addTracksAndPlay";
-import { checkDevice } from "@/server-actions/spotify/checkDevice";
-import { initializePlaylistData } from "@/server-actions/spotify/initializePlaylistData";
-import { PlaylistCache } from "@/types/custom";
-import { checkCacheAndUpdate } from "@/utils/checkCacheAndUpdate";
-import { getRandomSample } from "@/utils/getRandomSample";
+import { generateTracklist } from "@/lib/actions/openai/generateTracklist";
+import { addTracksAndPlay } from "@/lib/actions/spotify/addTracksAndPlay";
+import { checkDevice } from "@/lib/actions/spotify/checkDevice";
+import { initializePlaylistData } from "@/lib/actions/spotify/initializePlaylistData";
+import { Loader } from "@/lib/components/Loader";
+import { Button } from "@/lib/components/ui/button";
+import { Textarea } from "@/lib/components/ui/textarea";
+import { ToggleGroup, ToggleGroupItem } from "@/lib/components/ui/toggle-group";
+import { useToast } from "@/lib/hooks/use-toast";
+import { PlaylistCache } from "@/lib/types/custom";
+import { checkCacheAndUpdate } from "@/lib/utils/checkCacheAndUpdate";
+import { getRandomSample } from "@/lib/utils/getRandomSample";
 import { ChevronLeft, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 

@@ -6,8 +6,8 @@
 
 "use server";
 
-import { CustomPlaylistDataResponse } from "@/types/custom";
-import { SpotifyPlaylistResponse, SpotifyTrack } from "@/types/spotify";
+import { CustomPlaylistDataResponse } from "@/lib/types/custom";
+import { SpotifyPlaylistResponse, SpotifyTrack } from "@/lib/types/spotify";
 import { cookies } from "next/headers";
 
 export const getPlaylistData = async (

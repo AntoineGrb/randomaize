@@ -1,8 +1,8 @@
 "use server";
 
-import { CustomTrack } from "@/types/custom";
-import { OpenAIResponse } from "@/types/openai";
-import { validateAiResponse } from "@/utils/validateAiResponse";
+import { CustomTrack } from "@/lib/types/custom";
+import { OpenAIResponse } from "@/lib/types/openai";
+import { validateAiResponse } from "@/lib/utils/validateAiResponse";
 import { cookies } from "next/headers";
 
 export const generateTracklist = async (

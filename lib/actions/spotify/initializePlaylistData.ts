@@ -7,9 +7,9 @@
 
 "use server";
 
-import { getArtistGenres } from "@/server-actions/spotify/getArtistsGenres";
-import { getPlaylistData } from "@/server-actions/spotify/getPlaylistData";
-import { CustomPlaylistDataResponse, CustomTrack } from "@/types/custom";
+import { CustomPlaylistDataResponse, CustomTrack } from "@/lib/types/custom";
+import { getArtistGenres } from "@/lib/actions/spotify/getArtistsGenres";
+import { getPlaylistData } from "@/lib/actions/spotify/getPlaylistData";
 
 export async function initializePlaylistData(playlistId: string): Promise<{
   playlistInfos: CustomPlaylistDataResponse["infos"];

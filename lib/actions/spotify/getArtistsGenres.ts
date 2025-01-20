@@ -7,7 +7,10 @@
 
 "use server";
 
-import { SpotifyArtistGenre, SpotifyArtistsResponse } from "@/types/spotify";
+import {
+  SpotifyArtistGenre,
+  SpotifyArtistsResponse,
+} from "@/lib/types/spotify";
 import { cookies } from "next/headers";
 
 export const getArtistGenres = async (

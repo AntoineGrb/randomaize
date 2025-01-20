@@ -1,6 +1,6 @@
 "use client";
 
-import Footer from "@/components/Footer";
+import Footer from "@/lib/components/Footer";
 
 export default function LoginPage() {
   const handleLogin = () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthContextProps, UserProps } from "@/types/context";
+import { AuthContextProps, UserProps } from "@/lib/types/context";
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState } from "react";
 

@@ -2,7 +2,10 @@
 
 ("use server");
 
-import { AudioFeatures, SpotifyAudioFeaturesResponse } from "@/types/spotify";
+import {
+  AudioFeatures,
+  SpotifyAudioFeaturesResponse,
+} from "@/lib/types/spotify";
 import { cookies } from "next/headers";
 
 export const getTrackAudioFeatures = async (

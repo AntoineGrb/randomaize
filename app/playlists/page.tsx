@@ -1,5 +1,5 @@
-import { getUserPlaylists } from "@/server-actions/spotify/getUserPlaylists";
-import { CustomPlaylist } from "@/types/custom";
+import { CustomPlaylist } from "@/lib/types/custom";
+import { getUserPlaylists } from "@/lib/actions/spotify/getUserPlaylists";
 import Link from "next/link";
 
 export default async function PlaylistsPage() {

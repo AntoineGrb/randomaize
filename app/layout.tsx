@@ -1,10 +1,9 @@
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/lib/components/ui/toaster";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 
-import Footer from "@/components/Footer";
-import Header from "@/components/Header";
-import { AuthProvider } from "@/context/AuthContext";
+import Header from "@/lib/components/Header";
+import { AuthProvider } from "@/lib/context/AuthContext";
 import "react-toastify/dist/ReactToastify.css"; // Import des styles par défaut de react-toastify
 import "./globals.css";
 
