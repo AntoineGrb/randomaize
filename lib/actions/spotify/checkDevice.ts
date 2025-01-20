@@ -64,9 +64,10 @@ export const checkDevice = async (): Promise<{
       }
     }
 
-    throw new Error(
-      "Pas d'appareil actif trouvé. Veuillez ouvrir Spotify sur un appareil pour continuer."
-    );
+    throw new Error(`
+      Pas d'appareil actif trouvé.
+      Veuillez lancer Spotify sur un appareil pour continuer.
+    `);
   } catch (error) {
     console.error("Error in checkDevice:", error);
     return { error: error instanceof Error ? error.message : "Erreur inconue" };
