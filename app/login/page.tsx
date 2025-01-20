@@ -1,5 +1,7 @@
 "use client";
 
+import Footer from "@/components/Footer";
+
 export default function LoginPage() {
   const handleLogin = () => {
     window.location.href = "/api/auth/login"; // Redirect to the login API
@@ -19,13 +21,7 @@ export default function LoginPage() {
           Connexion à Spotify
         </button>
       </main>
-      <footer className="absolute bottom-0 w-full border-t border-white py-4 text-center">
-        <p className="text-xs">
-          2025 © Antoine Grb
-          <br />
-          L'IA peut commettre des erreurs lors de l'élaboration des playlists.
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 }

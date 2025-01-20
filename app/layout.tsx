@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { AuthProvider } from "@/context/AuthContext";
 import "react-toastify/dist/ReactToastify.css"; // Import des styles par défaut de react-toastify
@@ -35,11 +36,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-spotify-black text-white h-[100dvh] w-full m-0 p-0 ${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
+        className={`bg-spotify-black text-white h-[100dvh] w-full m-0 p-0 max-w-[500px] mx-auto ${geistSans.variable} ${geistMono.variable} ${inter.variable} antialiased`}
       >
         <AuthProvider>
           <Header />
-          <main className="w-full h-[100dvh] max-w-[500px] mx-auto">
+          <main className="w-full h-[100dvh]">
             {children}
             <Toaster />
           </main>

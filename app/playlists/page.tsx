@@ -17,7 +17,7 @@ export default async function PlaylistsPage() {
           )
           .map((playlist: CustomPlaylist) => (
             <Link href={`/generate/${playlist.id}`} key={playlist.id}>
-              <li className="flex gap-2 items-center border-b-2 border-gray-700 pb-2 cursor-pointer">
+              <li className="flex gap-2 items-center border-b-2 border-gray-700 pb-2 cursor-pointer min-h-[90px]">
                 {playlist.image && (
                   <img src={playlist.image} alt={playlist.name} width="80" />
                 )}
@@ -39,7 +39,7 @@ export default async function PlaylistsPage() {
         )
         .map((playlist: CustomPlaylist) => (
           <Link href={`/generate/${playlist.id}`} key={playlist.id}>
-            <li className="flex gap-2 items-center border-b-2 border-gray-700 pb-2 cursor-pointer">
+            <li className="flex gap-2 items-center border-b-2 border-gray-700 pb-2 cursor-pointer min-h-[90px]">
               {playlist.image && (
                 <img src={playlist.image} alt={playlist.name} width="80" />
               )}
