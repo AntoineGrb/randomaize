@@ -2,6 +2,8 @@
 
 RANDOMAIZE est une application web qui vous permet de transformer vos playlists Spotify avec l'aide de l'IA, pour créer une expérience musicale unique et adaptée à vos envies.
 
+[EDIT] : L'application est en dev mode, c'est à dire que les utilisateurs doivent être autorisés manuellement pour pouvoir se connecter.
+
 ---
 
 ## Présentation 🌟
